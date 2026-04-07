@@ -18,7 +18,7 @@
 
 ### 1.1 Student Model Selection
 
-We selected **Phi-3.5 Mini Instruct** (`microsoft/Phi-3.5-mini-instruct`) as our student model for the following reasons:
+I selected **Phi-3.5 Mini Instruct** (`microsoft/Phi-3.5-mini-instruct`) as my student model for the following reasons:
 
 - **Strong small-model performance:** Despite having only 3.8B parameters, Phi-3.5 Mini achieves competitive performance on instruction-following benchmarks relative to larger models.
 - **Practical suitability for QLoRA:** Its size fits comfortably within the UTSA ARC V100 GPU's 32GB VRAM budget when loaded in 4-bit quantization.
@@ -27,7 +27,7 @@ We selected **Phi-3.5 Mini Instruct** (`microsoft/Phi-3.5-mini-instruct`) as our
 
 ### 1.2 Alpaca Data Source (Stage 1)
 
-For Stage 1, we used the **Alpaca-Cleaned** dataset (`yahma/alpaca-cleaned`) — a cleaned version of the original Stanford Alpaca dataset. This dataset contains 51,760 instruction-following examples covering a broad range of tasks including open-ended generation, rewriting, brainstorming, summarization, and simple QA.
+For Stage 1, I used the **Alpaca-Cleaned** dataset (`yahma/alpaca-cleaned`) — a cleaned version of the original Stanford Alpaca dataset. This dataset contains 51,760 instruction-following examples covering a broad range of tasks including open-ended generation, rewriting, brainstorming, summarization, and simple QA.
 
 **Data preparation:**
 - Downloaded and cleaned the dataset, removing malformed examples with empty instructions or outputs
@@ -37,7 +37,7 @@ For Stage 1, we used the **Alpaca-Cleaned** dataset (`yahma/alpaca-cleaned`) —
 
 ### 1.3 Teacher-Generated JSON Dataset (Stage 2)
 
-For Stage 2, we created a teacher-generated JSON Instruct dataset using **imitation learning** from **Llama 3.3 70B Instruct** (UTSA-hosted, accessed via VPN). This is not classical knowledge distillation — the student only sees the teacher's final text outputs and trains using standard supervised fine-tuning (cross-entropy loss).
+For Stage 2, I created a teacher-generated JSON Instruct dataset using **imitation learning** from **Llama 3.3 70B Instruct** (UTSA-hosted, accessed via VPN). This is not classical knowledge distillation — the student only sees the teacher's final text outputs and trains using standard supervised fine-tuning (cross-entropy loss).
 
 **Imitation learning pipeline:**
 1. Designed diverse task prompts covering all 5 required task types
@@ -61,7 +61,7 @@ Final split: **112 train** / **13 eval**
 
 ### 1.4 Training Design
 
-We implemented a two-stage QLoRA fine-tuning pipeline following the assignment specifications exactly:
+I implemented a two-stage QLoRA fine-tuning pipeline following the assignment specifications exactly:
 
 **QLoRA Configuration (both stages):**
 - Quantization: 4-bit NF4
@@ -124,7 +124,23 @@ Training was performed on UTSA's ARC HPC cluster:
 
 ## Section 2: Experiments
 
-### 2.1 Three-Checkpoint Comparison Table
+### 2.1 Three-Checkpoint Comparison
+
+**Figure 1: Stage 1 Training Curves (Alpaca Fine-Tuning)**
+![Stage 1 Train Loss](figures/stage1_train_loss.png)
+*Training loss and learning rate decay over 5,822 steps (2 epochs) on Alpaca-Cleaned dataset.*
+
+**Figure 2: Stage 1 Evaluation Loss**
+![Stage 1 Eval Loss](figures/stage1_eval_loss.png)
+*Evaluation loss decreasing from 0.92 to 0.874 over training, indicating consistent learning.*
+
+**Figure 3: Stage 2 Training Curves (Teacher JSON Fine-Tuning)**
+![Stage 2 Train Loss](figures/stage2_train_loss.png)
+*Training loss dropping from 0.85 to 0.52 over 70 steps (10 epochs) on teacher-generated JSON data.*
+
+**Figure 4: Stage 2 Evaluation Loss**
+![Stage 2 Eval Loss](figures/stage2_eval_loss.png)
+*Evaluation loss at 0.56 after Stage 2 training on JSON data.* Table
 
 *This table will be filled with actual measured values after all training and evaluation completes.*
 
@@ -205,7 +221,7 @@ Training was performed on UTSA's ARC HPC cluster:
 
 ### 2.5 Ablation Study Results
 
-We conducted 3 ablation experiments on Stage 2 training to identify which training decisions most strongly influence the forgetting/retention tradeoff.
+I conducted 3 ablation experiments on Stage 2 training to identify which training decisions most strongly influence the forgetting/retention tradeoff.
 
 #### Ablation 1: Vary Stage 2 Epochs
 
@@ -265,14 +281,14 @@ We conducted 3 ablation experiments on Stage 2 training to identify which traini
 
 ### 3.2 Failure Case Analysis
 
-TBD — After results are available, we will document cases where:
+TBD — After results are available, I will document cases where:
 - Checkpoint 2 regressed on Alpaca tasks compared to Checkpoint 1
 - The model generated invalid JSON even after Stage 2 training
 - The model hallucinated content in structured outputs
 
 ### 3.3 Discussion: Forgetting vs Retention
 
-TBD — Based on our results, we will discuss:
+TBD — Based on my results, I will discuss:
 
 **If forgetting occurred:**
 - Possible causes: learning rate too high, too many epochs, insufficient data diversity
@@ -285,7 +301,7 @@ TBD — Based on our results, we will discuss:
 
 ### 3.4 Implications for Sequential Fine-Tuning
 
-TBD — What our results imply about:
+TBD — What my results imply about:
 - The safety of sequential fine-tuning for specialization
 - The role of dataset size in catastrophic forgetting
 - The effectiveness of imitation learning for structured output tasks
@@ -297,7 +313,7 @@ TBD — What our results imply about:
 
 ### 4.1 Teacher Model Prompt Design
 
-We designed prompts for 5 JSON task types. Each prompt template is stored in `prompts/` as an editable file.
+I designed prompts for 5 JSON task types. Each prompt template is stored in `prompts/` as an editable file.
 
 **Design principles:**
 1. **Clear task specification:** Each prompt explicitly states what JSON structure is expected
@@ -325,11 +341,11 @@ Text: {input_text}
 Return only the JSON object.
 ```
 
-**Iteration process:** Initial prompts produced markdown-wrapped responses (` ```json ``` `). We added explicit rules — "No markdown, no code blocks" — which reduced invalid outputs significantly. We also added a system message reinforcing JSON-only output.
+**Iteration process:** Initial prompts produced markdown-wrapped responses (` ```json ``` `). I added explicit rules — "No markdown, no code blocks" — which reduced invalid outputs significantly. I also added a system message reinforcing JSON-only output.
 
 ### 4.2 Judge Prompt Design
 
-We designed separate judge prompts for Alpaca and JSON evaluations:
+I designed separate judge prompts for Alpaca and JSON evaluations:
 
 **Key design decisions:**
 1. **Structured scoring:** 6 dimensions with 1-5 scale forces nuanced evaluation
@@ -337,7 +353,7 @@ We designed separate judge prompts for Alpaca and JSON evaluations:
 3. **Position bias mitigation:** Response order randomized (A/B swapped) for 50% of examples
 4. **Task-specific prompts:** JSON judge prompt emphasizes schema validity; Alpaca prompt emphasizes instruction following
 
-**Judge prompt iteration:** Initial prompts sometimes produced verbose justifications that interfered with JSON parsing. We added "Return ONLY valid JSON" and a system message to resolve this.
+**Judge prompt iteration:** Initial prompts sometimes produced verbose justifications that interfered with JSON parsing. I added "Return ONLY valid JSON" and a system message to resolve this.
 
 ---
 
@@ -515,7 +531,7 @@ This template was used consistently during both training and inference. It is cr
 {output}  ← only included during training, omitted during inference
 ```
 
-**Why this template:** Following the TA's recommendation and the Alpaca paper's approach, we use a simple three-part template that clearly separates the instruction, optional input, and expected response. The `### Response:` marker signals to the model where to begin generating.
+**Why this template:** Following the TA's recommendation and the Alpaca paper's approach, I use a simple three-part template that clearly separates the instruction, optional input, and expected response. The `### Response:` marker signals to the model where to begin generating.
 
 ---
 
