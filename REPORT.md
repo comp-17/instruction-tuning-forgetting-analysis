@@ -369,3 +369,272 @@ All prompt templates are stored in `prompts/` directory:
 5. Gu, J. et al. (2024). A Survey on LLM-as-a-Judge. *arXiv:2411.15594*
 6. Kenton, Z. et al. (2024). On Scalable Oversight with Weak LLMs Judging Strong LLMs. *DeepMind*
 7. Rafailov, R. et al. (2024). From Human Preferences to Post-Training Alignment Pipelines. *arXiv*
+
+
+---
+
+## Appendix: Full Prompt Templates
+
+### A1. Teacher Model Prompts (Imitation Learning)
+
+These prompts were used to generate the Stage 2 training dataset by feeding them to Llama 3.3 70B Instruct. All outputs were validated for JSON correctness before inclusion.
+
+---
+
+#### A1.1 JSON Extraction Prompt (`prompts/json_extraction.txt`)
+
+```
+You are a precise JSON extraction assistant. Your job is to extract structured information from unstructured text and return it as valid JSON only.
+
+Rules:
+- Return ONLY valid JSON. No explanation, no markdown, no code blocks.
+- Use null for missing values.
+- Use arrays for multiple values.
+- All keys must be lowercase with underscores.
+
+Task: Extract all relevant entities and attributes from the following text into a JSON object.
+
+Text: {input_text}
+
+Return only the JSON object.
+```
+
+**Design rationale:** The explicit "no markdown, no code blocks" rule was added after initial prompts returned responses wrapped in triple backticks. The lowercase underscore rule enforces consistent key naming across all extraction examples.
+
+---
+
+#### A1.2 Schema-Constrained Generation Prompt (`prompts/schema_generation.txt`)
+
+```
+You are a precise JSON generation assistant. Your job is to generate a valid JSON object that strictly conforms to the given schema.
+
+Rules:
+- Return ONLY valid JSON. No explanation, no markdown, no code blocks.
+- Every required field in the schema must be present.
+- Value types must exactly match the schema types.
+- Use realistic and meaningful values.
+
+Task: Generate a valid JSON object that conforms to this schema:
+
+Schema: {schema}
+
+Context: {context}
+
+Return only the JSON object.
+```
+
+**Design rationale:** The "realistic and meaningful values" rule prevents the model from generating placeholder values like "string" or "integer" instead of actual data. The context field guides the model toward domain-appropriate values.
+
+---
+
+#### A1.3 Classification with JSON Output Prompt (`prompts/classification.txt`)
+
+```
+You are a precise text classification assistant. Your job is to classify the given text and return the result as valid JSON only.
+
+Rules:
+- Return ONLY valid JSON. No explanation, no markdown, no code blocks.
+- Use only the allowed labels provided.
+- Include a confidence score between 0.0 and 1.0.
+- Include a brief reason field.
+
+Task: Classify the following text using only the allowed labels.
+
+Text: {input_text}
+
+Allowed labels: {labels}
+
+Return a JSON object with exactly these fields: {"label": "...", "confidence": 0.0, "reason": "..."}
+```
+
+**Design rationale:** The explicit output schema at the end (`{"label": ..., "confidence": ..., "reason": ...}`) was added after initial outputs used inconsistent field names. Specifying allowed labels prevents label hallucination.
+
+---
+
+#### A1.4 JSON Repair Prompt (`prompts/json_repair.txt`)
+
+```
+You are a precise JSON repair assistant. Your job is to fix malformed JSON and return only the corrected valid JSON.
+
+Rules:
+- Return ONLY valid JSON. No explanation, no markdown, no code blocks.
+- Fix all syntax errors such as missing quotes, missing brackets, trailing commas, wrong types.
+- Preserve the original structure and values as much as possible.
+- Do not add or remove fields unless necessary to make it valid.
+
+Task: Fix the following malformed JSON and return the corrected version.
+
+Malformed JSON: {malformed_json}
+
+Input: {malformed_json}
+
+Return only the corrected valid JSON object.
+```
+
+**Design rationale:** The "preserve original structure" rule prevents the model from completely rewriting the JSON rather than minimally fixing it. The "do not add or remove fields" rule ensures the repair is surgical.
+
+---
+
+#### A1.5 Tool-Call Argument Generation Prompt (`prompts/tool_call.txt`)
+
+```
+You are a precise function call assistant. Your job is to generate a valid JSON object representing a function call with the correct named parameters.
+
+Rules:
+- Return ONLY valid JSON. No explanation, no markdown, no code blocks.
+- All required parameters must be present.
+- Parameter types must match the function signature exactly.
+- Use realistic and meaningful values based on the context.
+
+Task: Generate a JSON object representing a call to the following function.
+
+Function name: {function_name}
+Function description: {function_description}
+Parameters: {parameters}
+Context: {context}
+
+Return a JSON object with exactly this structure: {"function": "...", "arguments": {...}}
+```
+
+**Design rationale:** The explicit output structure `{"function": ..., "arguments": {...}}` standardizes the format across all tool-call examples. The context field provides the scenario that determines parameter values.
+
+---
+
+### A2. Student Model Instruction Template
+
+This template was used consistently during both training and inference. It is critical that the same template is used at inference time as was used during training.
+
+```
+### Instruction:
+{instruction}
+
+### Input:
+{input}   ← only included if input is non-empty
+
+### Response:
+{output}  ← only included during training, omitted during inference
+```
+
+**Why this template:** Following the TA's recommendation and the Alpaca paper's approach, we use a simple three-part template that clearly separates the instruction, optional input, and expected response. The `### Response:` marker signals to the model where to begin generating.
+
+---
+
+### A3. Judge Evaluation Prompts
+
+#### A3.1 Alpaca Judge Prompt (`prompts/judge_alpaca.txt`)
+
+```
+You are an expert judge evaluating the quality of AI assistant responses.
+You will be shown an instruction and two responses (Response A and Response B).
+Your task is to evaluate both responses and determine which is better.
+
+Instruction:
+{instruction}
+
+Input (if any):
+{input}
+
+Response A:
+{response_a}
+
+Response B:
+{response_b}
+
+Please evaluate both responses on these 6 dimensions (score 1-5 each):
+1. instruction_following: How well does the response follow the instruction?
+2. correctness: Is the response factually correct and accurate?
+3. clarity: Is the response clear and well-written?
+4. completeness: Does the response fully address the instruction?
+5. structured_output_validity: Is any structured output valid and well-formed?
+6. hallucination_risk: How likely is fabricated information? (5=no hallucination, 1=high)
+
+Return ONLY valid JSON in this exact format:
+{
+    "response_a_scores": {
+        "instruction_following": <1-5>,
+        "correctness": <1-5>,
+        "clarity": <1-5>,
+        "completeness": <1-5>,
+        "structured_output_validity": <1-5>,
+        "hallucination_risk": <1-5>
+    },
+    "response_b_scores": {
+        "instruction_following": <1-5>,
+        "correctness": <1-5>,
+        "clarity": <1-5>,
+        "completeness": <1-5>,
+        "structured_output_validity": <1-5>,
+        "hallucination_risk": <1-5>
+    },
+    "winner": "<A|B|tie>",
+    "justification": "<brief explanation>"
+}
+```
+
+**Design rationale:** The 6-dimension scoring rubric forces nuanced evaluation beyond simple win/loss. The hallucination_risk dimension is scored inversely (5=safe, 1=risky) which required careful wording to avoid confusion. The JSON output format enables automated aggregation across 100+ comparisons. Response order is randomized 50% of the time to reduce position bias.
+
+---
+
+#### A3.2 JSON Judge Prompt (`prompts/judge_json.txt`)
+
+```
+You are an expert judge evaluating the quality of AI assistant responses to structured JSON tasks.
+You will be shown an instruction and two responses (Response A and Response B).
+
+Instruction:
+{instruction}
+
+Input (if any):
+{input}
+
+Response A:
+{response_a}
+
+Response B:
+{response_b}
+
+Please evaluate both responses on these 6 dimensions (score 1-5 each):
+1. instruction_following: How well does the response follow the instruction?
+2. correctness: Is the JSON content correct and accurate?
+3. clarity: Is the response clear and well-structured?
+4. completeness: Does the response include all required fields?
+5. structured_output_validity: Is the JSON syntactically valid and schema-compliant? (5=perfect, 1=invalid)
+6. hallucination_risk: Does it contain fabricated values? (5=no hallucination, 1=high)
+
+Return ONLY valid JSON in this exact format:
+{
+    "response_a_scores": {
+        "instruction_following": <1-5>,
+        "correctness": <1-5>,
+        "clarity": <1-5>,
+        "completeness": <1-5>,
+        "structured_output_validity": <1-5>,
+        "hallucination_risk": <1-5>
+    },
+    "response_b_scores": {
+        "instruction_following": <1-5>,
+        "correctness": <1-5>,
+        "clarity": <1-5>,
+        "completeness": <1-5>,
+        "structured_output_validity": <1-5>,
+        "hallucination_risk": <1-5>
+    },
+    "winner": "<A|B|tie>",
+    "justification": "<brief explanation focusing on JSON quality>"
+}
+```
+
+**Design rationale:** This prompt differs from the Alpaca judge by emphasizing `structured_output_validity` as the primary quality signal for JSON tasks. The justification explicitly asks to focus on JSON quality. The system message `"You are an expert AI judge. Always respond with valid JSON only."` prevents the judge from wrapping its response in prose.
+
+---
+
+### A4. Prompt Engineering Iteration Log
+
+| Iteration | Problem | Fix | Result |
+|---|---|---|---|
+| v1 | Teacher responses wrapped in ```json``` | Added "no markdown, no code blocks" rule | Reduced markdown wrapping by ~80% |
+| v2 | Teacher used placeholder values ("string", "integer") | Added "realistic and meaningful values" | More natural JSON outputs |
+| v3 | Judge responses included prose before JSON | Added system message "respond with valid JSON only" | JSON parsing success rate improved |
+| v4 | Classification outputs used unlisted labels | Added explicit allowed labels list | Zero label hallucination |
+| v5 | Tool-call outputs had inconsistent structure | Added explicit output format template | Standardized structure across all examples |
+| v6 | JSON repair rewrote entire structure | Added "preserve original structure" rule | Minimal surgical fixes |
