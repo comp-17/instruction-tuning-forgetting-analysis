@@ -12,7 +12,7 @@ This repository implements a two-stage sequential instruction-tuning pipeline fo
 **Core Research Question:**
 > Does fine-tuning a small LLM on Alpaca data followed by teacher-generated JSON data improve structured-output reliability while maintaining general instruction-following ability, or does catastrophic forgetting occur?
 
-**Key Finding:** Stage 2 JSON fine-tuning achieves perfect structured output validity scores (5.0/5 judge score) while causing measurable ROUGE regression (−30.4%). BERTScore is largely preserved (−1.4%), indicating semantic content is maintained despite surface-level forgetting.
+**Key Finding:** Stage 2 JSON fine-tuning achieves near-perfect structured output validity scores (4.98/5 judge score) with no catastrophic forgetting — ROUGE metrics actually improved from Checkpoint 1 to Checkpoint 2 (+4.5% ROUGE-L), and BERTScore dropped by only 0.7%. Sequential fine-tuning on a small, high-quality teacher-generated dataset proved additive rather than destructive.
 
 ---
 
@@ -246,28 +246,28 @@ sbatch scripts/slurm_stage2.sh
 
 | Checkpoint | ROUGE-L | BERTScore F1 | JSON Validity | Judge Win Rate |
 |---|---|---|---|---|
-| Checkpoint 0 (base) | 0.2032 | 0.8573 | 100% | 82.0% (vs C1) |
-| Checkpoint 1 (Alpaca) | 0.1587 | 0.8408 | 100% | 12.0% (vs C0) |
-| Checkpoint 2 (JSON) | 0.1105 | 0.8292 | 100% | 47.0% (vs C1) |
+| Checkpoint 0 (base) | 0.1596 | 0.8506 | 97.6% | 80.0% (vs C1) |
+| Checkpoint 1 (Alpaca) | 0.1072 | 0.8384 | 96.0% | 11.0% (vs C0) |
+| Checkpoint 2 (JSON) | 0.1120 | 0.8322 | 98.4% | 49.0% (vs C1) |
 
 ### Forgetting Analysis (C1 → C2)
 
 | Metric | Change | Verdict |
 |---|---|---|
-| ROUGE-L | −30.4% | FORGETTING |
-| BERTScore F1 | −1.4% | MAINTAINED |
-| Judge Win Rate | C2 wins 47% vs C1's 26% | IMPROVED |
+| ROUGE-L | +4.5% | MAINTAINED |
+| BERTScore F1 | −0.7% | MAINTAINED |
+| Judge Win Rate | C2 wins 49% vs C1's 25% | IMPROVED |
 
 ### JSON Judge Scores (Checkpoint 2)
 
 | Dimension | Score |
 |---|---|
-| Instruction Following | 4.77 / 5 |
-| Correctness | **5.0 / 5** |
-| Clarity | 4.92 / 5 |
-| Completeness | 4.77 / 5 |
-| Structured Output Validity | **5.0 / 5** |
-| Hallucination Risk | **5.0 / 5** |
+| Instruction Following | 4.74 / 5 |
+| Correctness | **4.78 / 5** |
+| Clarity | 4.81 / 5 |
+| Completeness | 4.72 / 5 |
+| Structured Output Validity | **4.98 / 5** |
+| Hallucination Risk | 4.89 / 5 |
 
 ---
 
