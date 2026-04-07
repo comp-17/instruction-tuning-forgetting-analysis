@@ -1,0 +1,19 @@
+{
+  "stage": "stage1",
+  "model": "microsoft/Phi-3.5-mini-instruct",
+  "dataset": "alpaca-cleaned",
+  "train_examples": 46584,
+  "eval_examples": 100,
+  "epochs": 2,
+  "total_steps": 5822,
+  "learning_rate": 0.00002,
+  "batch_size": 4,
+  "gradient_accumulation_steps": 4,
+  "max_seq_length": 1024,
+  "lora_rank": 16,
+  "lora_alpha": 32,
+  "lora_dropout": 0.05,
+  "final_eval_loss": 0.8739,
+  "final_checkpoint": "/work/fpb170/assignment3/outputs/stage1/final",
+  "wandb_run": "stage1_alpaca"
+}

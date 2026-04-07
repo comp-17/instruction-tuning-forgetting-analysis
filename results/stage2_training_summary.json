@@ -1,0 +1,13 @@
+{
+  "stage": "stage2",
+  "model": "microsoft/Phi-3.5-mini-instruct",
+  "dataset": "teacher_json",
+  "stage1_adapter": "/work/fpb170/assignment3/outputs/stage1/final",
+  "train_examples": 112,
+  "eval_examples": 13,
+  "epochs": 10,
+  "learning_rate": 2e-05,
+  "lora_rank": 16,
+  "lora_alpha": 32,
+  "final_checkpoint": "/work/fpb170/assignment3/outputs/stage2/final"
+}
