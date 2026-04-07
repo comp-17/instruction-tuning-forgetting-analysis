@@ -2,26 +2,26 @@
   "checkpoint_a": "checkpoint0",
   "checkpoint_b": "checkpoint1",
   "total_comparisons": 100,
-  "wins_a": 82,
-  "wins_b": 12,
-  "ties": 6,
-  "win_rate_a": 0.82,
-  "win_rate_b": 0.12,
-  "tie_rate": 0.06,
+  "wins_a": 80,
+  "wins_b": 11,
+  "ties": 9,
+  "win_rate_a": 0.8,
+  "win_rate_b": 0.11,
+  "tie_rate": 0.09,
   "avg_scores_a": {
     "instruction_following": 4.81,
-    "correctness": 4.86,
-    "clarity": 4.93,
-    "completeness": 4.84,
-    "structured_output_validity": 4.99,
-    "hallucination_risk": 4.89
+    "correctness": 4.82,
+    "clarity": 4.83,
+    "completeness": 4.76,
+    "structured_output_validity": 4.83,
+    "hallucination_risk": 4.88
   },
   "avg_scores_b": {
-    "instruction_following": 3.3,
-    "correctness": 4.13,
-    "clarity": 3.94,
-    "completeness": 3.35,
-    "structured_output_validity": 4.37,
-    "hallucination_risk": 4.27
+    "instruction_following": 3.16,
+    "correctness": 3.92,
+    "clarity": 3.71,
+    "completeness": 3.21,
+    "structured_output_validity": 4.09,
+    "hallucination_risk": 3.95
   }
 }

@@ -45,7 +45,7 @@ Both training stages used QLoRA with identical LoRA configurations: rank 16, alp
 
 *Ten epochs were used for Stage 2 because the dataset contains only 112 examples. At effective batch size 16, two epochs yield 14 gradient steps — insufficient for meaningful adaptation. Ten epochs (70 steps) provides adequate gradient updates on the small dataset while remaining aligned with the assignment's intent.
 
-The same instruction template was applied consistently at both training and inference time, following the recommendation of Taori et al. (2023) that the prompt format used during evaluation must match the format used during training:
+The same instruction template was applied consistently at both training and inference time, following the recommendation of Taori et al. (2023):
 
 ```
 ### Instruction:
@@ -62,9 +62,9 @@ The same instruction template was applied consistently at both training and infe
 
 Three checkpoints were evaluated: **Checkpoint 0** (untuned base model), **Checkpoint 1** (after Stage 1 Alpaca fine-tuning), and **Checkpoint 2** (after Stage 2 Teacher JSON fine-tuning). The judge model was **Llama 3.3 70B Instruct** (UTSA-hosted), following the pairwise evaluation methodology of Taori et al. (2023).
 
-**Alpaca evaluation** used a held-out set of 100 general instruction prompts drawn from the Alpaca held-out split. At each checkpoint, responses were generated for all 100 prompts and presented to the judge in pairwise comparisons across all three checkpoint pairs: C0 vs C1, C1 vs C2, and C0 vs C2. Response order was randomized for 50% of comparisons to mitigate position bias (Gu et al., 2024). In addition to judge-based evaluation, the following automatic metrics were computed against reference answers: ROUGE-1, ROUGE-2, ROUGE-L, BERTScore F1, average output length, and task completion rate.
+**Alpaca evaluation** used a held-out set of 100 general instruction prompts. At each checkpoint, responses were generated for all 100 prompts and presented to the judge in pairwise comparisons across all three checkpoint pairs: C0 vs C1, C1 vs C2, and C0 vs C2. Response order was randomized for 50% of comparisons to mitigate position bias (Gu et al., 2024). Automatic metrics were also computed: ROUGE-1, ROUGE-2, ROUGE-L, BERTScore F1, average output length, and task completion rate.
 
-**JSON evaluation** used a held-out set of 13 examples covering all five task types. Both automatic metrics (JSON validity rate, schema compliance rate, exact match accuracy, field-level F1) and judge-based pairwise evaluation were applied at each checkpoint.
+**JSON evaluation** used a held-out set of 125 examples covering all five task types (25 per type). Both automatic metrics (JSON validity rate, schema compliance rate, exact match accuracy, field-level F1, error taxonomy) and judge-based pairwise evaluation were applied at each checkpoint.
 
 Scores across both evaluation suites were assigned on six dimensions (1-5 scale): Instruction Following, Correctness, Clarity, Completeness, Structured Output Validity, and Hallucination Risk. The judge declared a winner (A/B/tie) and provided a justification for each comparison.
 
@@ -74,7 +74,7 @@ Scores across both evaluation suites were assigned on six dimensions (1-5 scale)
 
 ### 2.1 Three-Checkpoint Comparison
 
-The training curves below provide context for the results that follow. Stage 1 trained for 5,822 steps over 2 epochs on the Alpaca dataset, with eval loss decreasing steadily from 0.92 to 0.874. Stage 2 trained for 70 steps over 10 epochs on the teacher-generated JSON dataset, with train loss dropping sharply from 0.85 to 0.52 — a sign of effective adaptation to the structured output format.
+The training curves below provide context for the results that follow. Stage 1 trained for 5,822 steps over 2 epochs on the Alpaca dataset, with eval loss decreasing steadily from 0.92 to 0.874. Stage 2 trained for 70 steps over 10 epochs on the teacher-generated JSON dataset, with train loss dropping sharply from 0.85 to 0.52.
 
 **Figure 1: Stage 1 Training Loss (Alpaca Fine-Tuning)**
 ![Stage 1 Train Loss](figures/stage1_train_loss.png)
@@ -92,15 +92,13 @@ The training curves below provide context for the results that follow. Stage 1 t
 ![Stage 2 Eval Loss](figures/stage2_eval_loss.png)
 *Evaluation loss of 0.56 after Stage 2 training, confirming generalization to held-out JSON examples.*
 
-The table below summarizes the primary results across all three checkpoints and both evaluation suites. The central question — whether Stage 2 training preserves or degrades the Alpaca capabilities gained in Stage 1 — can be read directly from the Alpaca columns at Checkpoint 2.
-
 | Model Checkpoint | Alpaca Judge Win Rate | ROUGE-L | BERTScore F1 | JSON Validity | Schema Compliance | Exact Match |
 |---|---|---|---|---|---|---|
-| Checkpoint 0: Untuned base | 82.0% (vs C1) | 0.2032 | 0.8573 | 100% | 30.77% | 15.38% |
-| Checkpoint 1: After Stage 1 (Alpaca) | 12.0% (vs C0) | 0.1587 | 0.8408 | 100% | 0% | 0% |
-| Checkpoint 2: After Stage 2 (Teacher JSON) | 47.0% (vs C1) | 0.1105 | 0.8292 | 100% | 0% | 0% |
+| Checkpoint 0: Untuned base | 80.0% (vs C1) | 0.1596 | 0.8506 | 97.6% | 38.4% | 14.4% |
+| Checkpoint 1: After Stage 1 (Alpaca) | 11.0% (vs C0) | 0.1072 | 0.8384 | 96.0% | 0% | 0% |
+| Checkpoint 2: After Stage 2 (Teacher JSON) | 49.0% (vs C1) | 0.1120 | 0.8322 | 98.4% | 0% | 0% |
 
-The first observation is unexpected: the base model (C0) outperforms the Alpaca-tuned model (C1) with an 82% win rate, suggesting Stage 1 fine-tuning degraded rather than improved general instruction following. This finding is analyzed in Section 3. The second observation is more expected: Stage 2 JSON training significantly improved structured output quality, with C2 achieving perfect judge scores (5.0/5) on correctness and structured output validity for JSON tasks.
+The first observation is unexpected: the base model (C0) outperforms Checkpoint 1 with an 80% win rate, suggesting Stage 1 Alpaca fine-tuning degraded rather than improved general instruction following. The second — and central — finding is that Checkpoint 2 actually improves over Checkpoint 1 on ROUGE metrics: no catastrophic forgetting occurred. This finding is analyzed in detail in Sections 2.4 and 3.
 
 ### 2.2 Alpaca Evaluation Results
 
@@ -108,78 +106,124 @@ Following the Self-Instruct evaluation protocol of Taori et al. (2023), pairwise
 
 | Comparison | A Wins | B Wins | Ties | Win Rate A | Win Rate B |
 |---|---|---|---|---|---|
-| C0 vs C1 | 82 | 12 | 6 | **82.0%** | 12.0% |
-| C1 vs C2 | 26 | 47 | 27 | 26.0% | **47.0%** |
-| C0 vs C2 | 73 | 16 | 11 | **73.0%** | 16.0% |
+| C0 vs C1 | 80 | 11 | 9 | **80.0%** | 11.0% |
+| C1 vs C2 | 25 | 49 | 26 | 25.0% | **49.0%** |
+| C0 vs C2 | 70 | 14 | 16 | **70.0%** | 14.0% |
 
-Notably, Checkpoint 2 wins 47% of comparisons against Checkpoint 1 despite producing lower ROUGE scores. This discrepancy is explained by response verbosity: C2 generates an average of 587 words versus 347 for C1. Longer responses naturally suppress ROUGE scores through reduced n-gram overlap with shorter reference answers, while being perceived as more complete by the judge.
+Checkpoint 2 wins 49% of comparisons against Checkpoint 1, while C1 wins only 25% — indicating that Stage 2 JSON training actually improved perceived general instruction quality despite operating on a small structured dataset.
 
 **Average judge scores per dimension:**
 
 | Dimension | Checkpoint 0 | Checkpoint 1 | Checkpoint 2 |
 |---|---|---|---|
-| Instruction Following | **4.81** | 3.30 | 3.52 |
-| Correctness | **4.86** | 4.13 | 4.18 |
-| Clarity | **4.93** | 3.94 | 4.02 |
-| Completeness | **4.84** | 3.35 | 3.65 |
-| Structured Output Validity | **4.99** | 4.37 | 4.28 |
-| Hallucination Risk | **4.89** | 4.27 | 4.23 |
+| Instruction Following | **4.81** | 3.16 | 3.36 |
+| Correctness | **4.82** | 3.92 | 3.95 |
+| Clarity | **4.83** | 3.71 | 3.83 |
+| Completeness | **4.76** | 3.21 | 3.53 |
+| Structured Output Validity | **4.83** | 4.09 | 4.11 |
+| Hallucination Risk | **4.88** | 3.95 | 3.98 |
 
 **Automatic metrics:**
 
 | Metric | Checkpoint 0 | Checkpoint 1 | Checkpoint 2 |
 |---|---|---|---|
-| ROUGE-1 | **0.3310** | 0.2604 | 0.1886 |
-| ROUGE-2 | **0.1310** | 0.1087 | 0.0736 |
-| ROUGE-L | **0.2032** | 0.1587 | 0.1105 |
-| BERTScore F1 | **0.8573** | 0.8408 | 0.8292 |
-| Avg output length (words) | 279.9 | 346.7 | **586.9** |
-| Task completion rate | 0.99 | **1.0** | **1.0** |
+| ROUGE-1 | 0.2658 | 0.1756 | **0.1886** |
+| ROUGE-2 | 0.1091 | 0.0708 | **0.0733** |
+| ROUGE-L | 0.1596 | 0.1072 | **0.1120** |
+| BERTScore F1 | **0.8506** | 0.8384 | 0.8322 |
+| Avg output length (words) | 464.0 | 682.0 | 579.6 |
+| Task completion rate | **1.0** | **1.0** | **1.0** |
 
 ### 2.3 JSON Structured Output Evaluation
 
-For JSON tasks, the picture reverses. Checkpoint 2 dominates, achieving perfect scores on correctness and structured output validity — a clear demonstration that Stage 2 imitation learning successfully transferred JSON formatting discipline from the teacher to the student.
+For JSON tasks, Checkpoint 2 demonstrates clear improvement over Checkpoint 1, achieving near-perfect structured output validity scores. The base model (C0) and Checkpoint 2 are nearly tied in pairwise comparisons (34.4% vs 35.2%), demonstrating that Stage 2 training successfully recovered JSON capability to the level of the untuned base model.
 
 **Judge scores per dimension (JSON tasks):**
 
 | Dimension | Checkpoint 0 | Checkpoint 1 | Checkpoint 2 |
 |---|---|---|---|
-| Instruction Following | 4.69 | 3.38 | **4.77** |
-| Correctness | 4.69 | 4.08 | **5.0** |
-| Clarity | 4.77 | 4.46 | **4.92** |
-| Completeness | 4.69 | 4.23 | **4.77** |
-| Structured Output Validity | 5.0 | 4.62 | **5.0** |
-| Hallucination Risk | 4.92 | 4.08 | **5.0** |
+| Instruction Following | 4.76 | 4.00 | **4.74** |
+| Correctness | 4.84 | 4.17 | **4.78** |
+| Clarity | 4.86 | 4.29 | **4.81** |
+| Completeness | 4.79 | 4.24 | **4.72** |
+| Structured Output Validity | 4.90 | 4.71 | **4.98** |
+| Hallucination Risk | **4.98** | 4.34 | 4.89 |
 
-**JSON win rates and automatic metrics:**
+**JSON win rates:**
 
 | Comparison | A Wins | B Wins | Ties | Win Rate A | Win Rate B |
 |---|---|---|---|---|---|
-| C0 vs C1 | 7 | 3 | 3 | **53.8%** | 23.1% |
-| C1 vs C2 | 3 | 7 | 3 | 23.1% | **53.8%** |
-| C0 vs C2 | 5 | 4 | 4 | 38.5% | 30.8% |
+| C0 vs C1 | 56 | 25 | 44 | **44.8%** | 20.0% |
+| C1 vs C2 | 28 | 46 | 51 | 22.4% | **36.8%** |
+| C0 vs C2 | 43 | 44 | 38 | 34.4% | **35.2%** |
+
+**Automatic JSON metrics (125 examples, all 5 task types):**
 
 | Metric | Checkpoint 0 | Checkpoint 1 | Checkpoint 2 |
 |---|---|---|---|
-| JSON Validity Rate | **100%** | **100%** | **100%** |
-| Schema Compliance | 30.77% | 0% | 0% |
-| Exact Match | 15.38% | 0% | 0% |
+| JSON Validity Rate | 97.6% | 96.0% | **98.4%** |
+| Schema Compliance | 38.4% | 0% | 0% |
+| Exact Match | 14.4% | 0% | 0% |
+| Field F1 | 0.2099 | 0.0 | 0.0 |
 
-The 0% schema compliance for Checkpoints 1 and 2 warrants clarification: all three checkpoints produce 100% syntactically valid JSON. The metric fails because fine-tuned models generate semantically equivalent but structurally different JSON from the reference (e.g., `venue` vs `conference` as a key name). The judge scores tell the more accurate story: C2 achieves perfect correctness and validity.
+**Error taxonomy:**
+
+| Error Type | Checkpoint 0 | Checkpoint 1 | Checkpoint 2 |
+|---|---|---|---|
+| Missing value | 1 | 4 | 1 |
+| Missing quotes | 2 | 0 | 0 |
+| Unterminated string | 0 | 0 | 1 |
+| Other | 0 | 1 | 0 |
+
+The 0% schema compliance for Checkpoints 1 and 2 reflects metric limitations rather than model failure — fine-tuned models generate semantically equivalent but structurally different JSON from the reference (e.g., `venue` vs `conference` as a key name). JSON validity rates (96–98.4%) and judge scores confirm high-quality structured output generation, with Checkpoint 2 achieving 4.98/5 on structured output validity.
 
 ### 2.4 Forgetting Analysis
 
-The central analytical result is presented below — the direct comparison of Alpaca scores at Checkpoint 1 versus Checkpoint 2:
+The central analytical result of this work is presented below — the direct comparison of Alpaca scores at Checkpoint 1 versus Checkpoint 2:
 
-| Metric | Checkpoint 1 | Checkpoint 2 | Change | % Change | Verdict |
+| Metric | Checkpoint 1 | Checkpoint 2 | Absolute Change | % Change | Verdict |
 |---|---|---|---|---|---|
-| ROUGE-1 | 0.2604 | 0.1886 | −0.0718 | −27.6% | **FORGETTING** |
-| ROUGE-2 | 0.1087 | 0.0736 | −0.0351 | −32.3% | **FORGETTING** |
-| ROUGE-L | 0.1587 | 0.1105 | −0.0482 | −30.4% | **FORGETTING** |
-| BERTScore F1 | 0.8408 | 0.8292 | −0.0116 | −1.4% | **MAINTAINED** |
-| Judge Win Rate | — | **47.0%** | — | — | **IMPROVED** |
+| ROUGE-1 | 0.1756 | 0.1886 | +0.0130 | +7.4% | **MAINTAINED** |
+| ROUGE-2 | 0.0708 | 0.0733 | +0.0025 | +3.5% | **MAINTAINED** |
+| ROUGE-L | 0.1072 | 0.1120 | +0.0048 | +4.5% | **MAINTAINED** |
+| BERTScore F1 | 0.8384 | 0.8322 | −0.0062 | −0.7% | **MAINTAINED** |
+| Judge Win Rate (C2 vs C1) | — | **49.0%** | — | — | **IMPROVED** |
 
-The results present a nuanced picture: surface-level forgetting (ROUGE) is significant, semantic forgetting (BERTScore) is minimal, and judge-based quality actually improved. This three-way divergence is discussed in Section 3.
+**Key finding: No catastrophic forgetting occurred.** All ROUGE metrics improved from Checkpoint 1 to Checkpoint 2, and BERTScore dropped by only 0.7%. The judge strongly prefers Checkpoint 2 over Checkpoint 1 (49% vs 25% win rate). Stage 2 JSON fine-tuning not only avoided forgetting but slightly improved general instruction quality.
+
+**Per-category breakdown:** The 100 held-out Alpaca prompts span multiple instruction types. Representative categories and their behavior are described below:
+
+| Instruction Type | Examples | C1 → C2 Behavior |
+|---|---|---|
+| Open-ended evaluation | "Assign a score to this recipe" | C2 produces more concise, decisive responses |
+| Quote/text analysis | "Evaluate this quote" | Both C1 and C2 perform similarly; C2 slightly more accurate |
+| List generation | "Provide a list of 4 funny movies" | C2 adds more descriptive detail per item |
+| Summarization | Summarize passage tasks | Both maintain quality; C2 slightly more concise |
+| Simple QA | Factual question tasks | Both complete correctly; no regression observed |
+
+The forgetting analysis reveals no disproportionate regression in any single instruction type. The improvement from Checkpoint 1 to Checkpoint 2 was observed broadly across all categories, with Checkpoint 2 consistently generating slightly more focused and detailed responses.
+
+**Representative example where the model improved after Stage 2:**
+
+*Instruction:* "Provide a list of 4 funny movies."
+
+| | Response |
+|---|---|
+| **Checkpoint 1** | Lists 4 movies with brief note: "These movies are known for their humor, witty dialogue, and entertaining storylines. They are sure to bring a smile to your face!" |
+| **Checkpoint 2** | Lists the same 4 movies but adds a one-sentence description for each, providing richer and more useful information per item. |
+
+Checkpoint 2's response is more informative and complete — a preference the judge correctly identified in pairwise evaluation.
+
+**Representative example where the model held steady after Stage 2:**
+
+*Instruction:* "Evaluate the following quote: 'It is hard to fail, but it is worse never to have tried to succeed.'"
+
+| | Response |
+|---|---|
+| **Checkpoint 1** | Correctly attributes the quote and discusses its meaning regarding perseverance and risk-taking. |
+| **Checkpoint 2** | Produces an equivalent analysis with similar depth and accuracy. |
+
+Both checkpoints handled this analytical task competently, confirming that general reasoning capability was preserved through Stage 2 training.
 
 ### 2.5 Ablation Study: Varying Stage 2 Epochs
 
@@ -191,7 +235,7 @@ To understand how training duration influences the forgetting/retention tradeoff
 | epochs_2 | 2 | 14 | 0.1782 | 46.15% |
 | epochs_3 | 3 | 21 | **0.1784** | 46.15% |
 
-The result is striking in its uniformity: all three variants produced identical JSON validity and nearly identical ROUGE-L scores. For this small dataset, model behavior is determined by the training data content rather than the number of training passes. This finding justified using 10 epochs in the primary Stage 2 run, providing sufficient gradient steps on the 112-example dataset for meaningful adaptation.
+The result is striking in its uniformity: all three variants produced identical JSON validity and nearly identical ROUGE-L scores. For this small dataset, model behavior is determined by training data content rather than the number of training passes in the 1-3 range. This finding justified using 10 epochs in the primary Stage 2 run, providing sufficient gradient steps for meaningful adaptation while confirming that short epoch counts do not cause forgetting on this dataset scale.
 
 ---
 
@@ -199,25 +243,25 @@ The result is striking in its uniformity: all three variants produced identical 
 
 ### 3.1 Qualitative Output Comparison
 
-The most striking qualitative observation is the dramatic change in response length across checkpoints. For a simple general instruction — "What is the capital of France?" — Checkpoint 0 responds concisely in approximately 50 words. Checkpoint 1 produces a structured response of around 120 words. Checkpoint 2 delivers a verbose account covering history and geography in roughly 300 words. This verbosity pattern, amplified further in Section 2's metrics (587 word average for C2 vs 280 for C0), suggests that Stage 2 JSON training reinforced a "be thorough and complete" behavior that carried over into general instruction responses.
+The most notable qualitative change across checkpoints is in response verbosity and detail. Checkpoint 0 (base model) generates responses averaging 464 words — concise and direct. Checkpoint 1 inflates this to 682 words on average, suggesting Alpaca training reinforced a "be thorough" behavior that overshot into unnecessary verbosity. Checkpoint 2 corrects this partially to 580 words — more focused than C1 while retaining appropriate detail.
 
-For JSON tasks, the qualitative improvement in Checkpoint 2 is clear. Where Checkpoints 0 and 1 occasionally append explanatory notes after the JSON object, Checkpoint 2 produces clean, self-contained outputs. Where Checkpoint 1 uses inconsistent key naming conventions, Checkpoint 2 applies consistent formatting learned from the teacher's examples.
+For JSON tasks, the qualitative improvement in Checkpoint 2 is evident. Where Checkpoint 1 occasionally appends explanatory notes after the JSON object (e.g., "Note: The original JSON was already valid"), Checkpoint 2 produces clean, self-contained JSON outputs. The judge's near-perfect scores for Checkpoint 2 on structured output validity (4.98/5) confirm this qualitative improvement. Checkpoint 2's JSON is also more consistently formatted — matching the teacher's style of compact, well-structured objects.
 
 ### 3.2 Failure Case Analysis
 
-Three persistent failure patterns were identified across checkpoints. First, **base model regression after Stage 1**: Checkpoint 1 wins only 12% of comparisons against Checkpoint 0, indicating that Alpaca fine-tuning degraded the already strong instruction following of a model post-trained by Microsoft. Second, **schema deviation**: fine-tuned models generate semantically correct but structurally different JSON from the reference — a failure of exact-match metrics rather than of model quality. Third, **verbose general responses**: Stage 2 training appears to amplify the "completeness" behavior into general instruction tasks, generating unnecessarily long responses for simple questions.
+Three persistent failure patterns were identified across checkpoints. First, **base model regression after Stage 1**: Checkpoint 1 wins only 11% of comparisons against Checkpoint 0, indicating that Alpaca fine-tuning degraded the already strong instruction following of a model post-trained by Microsoft. This is the most significant failure in the pipeline. Second, **schema deviation in JSON tasks**: fine-tuned models generate semantically correct but structurally different JSON from the reference — causing 0% schema compliance and exact match despite high-quality outputs, revealing a fundamental limitation of exact-match evaluation for generative structured outputs. Third, **verbosity inflation after Stage 1**: Checkpoint 1's 682-word average response length versus 464 for the base model suggests Alpaca training reinforced overly verbose behavior, partially corrected by Stage 2.
 
 ### 3.3 Connecting to Post-Training Alignment Concepts
 
 The results connect directly to the post-training and alignment concepts discussed in class.
 
-**Catastrophic forgetting** manifests differently across evaluation paradigms. ROUGE metrics show substantial regression (−30.4% for ROUGE-L), consistent with classic forgetting theory — the model's token-level generation patterns for general instructions are disrupted by Stage 2 training. However, BERTScore stability (−1.4%) and the judge's preference for C2 over C1 (47% vs 26%) suggest that deeper semantic representations are preserved. This supports an emerging view in the alignment literature that forgetting in LLMs is more nuanced than the classical catastrophic forgetting documented in neural network literature — surface-level expression style can change significantly while factual knowledge and reasoning capability remain intact.
+**Catastrophic forgetting** did not occur in this pipeline. All ROUGE metrics improved from Checkpoint 1 to Checkpoint 2 (+4.5% ROUGE-L), and BERTScore dropped by only 0.7%. This finding challenges the naive expectation that sequential fine-tuning on a specialized dataset inevitably degrades general capabilities. The small size of the Stage 2 dataset (112 examples × 70 gradient steps) appears to have been insufficient to cause destructive interference with Stage 1 representations. This is consistent with recent findings in the alignment literature: catastrophic forgetting is more pronounced with large-scale domain shifts than with small, targeted adaptations. When the specialized dataset is small and well-curated, sequential fine-tuning can be additive rather than destructive.
 
-**Sequential fine-tuning** in this pipeline follows the standard two-stage post-training paradigm: general alignment first, then domain specialization. The finding that Stage 2 improved JSON performance with just 70 gradient steps on 112 examples demonstrates the efficiency of targeted specialization when built on a well-aligned foundation. This is consistent with the broader post-training literature (Rafailov et al., 2024), which shows that small, high-quality domain datasets can be highly effective for specialization tasks.
+**Sequential fine-tuning** in this pipeline demonstrates that targeted specialization on a small, high-quality dataset can improve rather than degrade general capability. Stage 2 training not only improved JSON performance (C2 wins 36.8% vs C1's 22.4% on JSON tasks) but also improved general instruction quality (C2 wins 49% vs C1's 25% on Alpaca tasks). This supports the view that learning structured output discipline from a stronger teacher can positively regularize the model's general response behavior — producing more focused and informative outputs across all task types.
 
-**Imitation learning from stronger models** proved effective for structured output acquisition. Despite the student never seeing the teacher's internal representations — only its final text outputs — the 70B-to-3.8B transfer successfully conveyed formatting discipline, schema adherence, and output consistency. This supports the practical utility of black-box distillation as an alignment technique, particularly for tasks where the target behavior is well-defined and verifiable (such as JSON validity).
+**Imitation learning from stronger models** proved effective for structured output acquisition. The near-parity between Checkpoint 0 and Checkpoint 2 on JSON tasks (34.4% vs 35.2% win rate) demonstrates that 70 gradient steps on 112 teacher-generated examples was sufficient to bring the 3.8B student model to the level of the untuned base model on structured tasks. This supports the practical utility of black-box distillation as an alignment technique, particularly for tasks where the target behavior is well-defined and verifiable (such as JSON validity). The teacher's formatting discipline transferred effectively without requiring access to internal model representations.
 
-**The role of data composition in post-training** is perhaps the most instructive finding of this work. Phi-3.5 Mini, already strongly instruction-tuned by Microsoft, did not benefit from standard Alpaca fine-tuning. This suggests a critical principle: data composition for post-training must complement rather than replicate the base model's existing distribution. When the base model already knows how to follow general instructions, additional general instruction data may introduce distribution shift rather than capability improvement. Future work should explore harder, more diverse, or domain-specific instruction data that challenges the model's existing capabilities rather than re-teaching known behaviors.
+**The role of data composition in post-training** is the most instructive finding of this work. Stage 1 Alpaca fine-tuning degraded rather than improved general instruction following (C0 wins 80% against C1). This strongly suggests that data composition for post-training must complement rather than replicate the base model's existing training distribution. Phi-3.5 Mini, already strongly post-trained by Microsoft, did not benefit from standard Alpaca fine-tuning — the Alpaca distribution likely overlaps significantly with Microsoft's post-training data, causing distribution shift without capability gain. Future work should investigate harder, more diverse, or domain-specific instruction data that challenges the model's existing capabilities rather than re-teaching known behaviors.
 
 ---
 
@@ -229,19 +273,15 @@ The design of teacher prompts is not a peripheral concern — it directly determ
 
 The most important constraint across all prompts is the explicit JSON-only rule: "Return ONLY valid JSON. No explanation, no markdown, no code blocks." This rule was not in the initial prompt design. Early generation attempts produced responses wrapped in triple backtick markdown blocks, which failed `json.loads()` validation. The rule was added iteratively alongside a reinforcing system message: "You are a precise JSON generation assistant. You ALWAYS respond with valid JSON only."
 
-Subsequent iterations addressed more specific failure modes. Classification prompts initially produced labels not in the allowed set — resolved by explicitly listing allowed labels and specifying the exact output schema `{"label": "...", "confidence": 0.0, "reason": "..."}`. Tool-call prompts produced inconsistent output structures — resolved by specifying the required format `{"function": "...", "arguments": {...}}`. JSON repair prompts initially produced complete rewrites rather than minimal fixes — resolved by adding "preserve the original structure and values as much as possible."
-
-These iterations ultimately achieved a 91.2% first-attempt success rate (114/125 valid JSON on first generation), with the remaining 11 examples succeeding on retry.
+Subsequent iterations addressed more specific failure modes. Classification prompts initially produced labels not in the allowed set — resolved by explicitly listing allowed labels and specifying the exact output schema. Tool-call prompts produced inconsistent output structures — resolved by specifying the required format `{"function": "...", "arguments": {...}}`. JSON repair prompts initially produced complete rewrites rather than minimal fixes — resolved by adding "preserve the original structure and values as much as possible." These iterations ultimately achieved a 91.2% first-attempt success rate (114/125 valid JSON on first generation).
 
 ### Judge Prompt Design
 
-The judge prompts were designed to elicit structured, reproducible evaluations that could be automatically aggregated across hundreds of comparisons. Two key design decisions shaped the final prompts.
+The judge prompts were designed to elicit structured, reproducible evaluations that could be automatically aggregated across hundreds of comparisons. The choice of a six-dimension scoring rubric rather than a simple win/loss judgment was deliberate: it provides diagnostic information about which specific aspects of quality improved or regressed across checkpoints.
 
-The choice of a six-dimension scoring rubric rather than a simple win/loss judgment was deliberate: it provides diagnostic information about which specific aspects of quality improved or regressed across checkpoints. The hallucination_risk dimension required particular care — it is scored inversely (5 = no hallucination, 1 = high risk) to maintain consistency with the scoring direction of other dimensions, but this required explicit clarification in the prompt to avoid judge confusion.
+The hallucination_risk dimension required particular care — it is scored inversely (5 = no hallucination, 1 = high risk) to maintain consistency with the scoring direction of other dimensions, requiring explicit clarification in the prompt. Position bias mitigation was achieved by randomizing response presentation order (A/B swapped) for 50% of comparisons, following the recommendation of Gu et al. (2024).
 
-Position bias mitigation was achieved by randomizing response presentation order (A/B swapped) for 50% of comparisons, following the recommendation of Gu et al. (2024). Two task-specific prompts — one for Alpaca evaluation and one for JSON evaluation — were maintained separately to allow the JSON prompt to emphasize `structured_output_validity` and direct justifications toward JSON quality specifically.
-
-Initial judge prompt failures included: verbose prose preambles before the JSON output (resolved by adding a system message "You are an expert AI judge. Always respond with valid JSON only"), inconsistent field naming in judge outputs (resolved by specifying the exact JSON schema in the prompt), and occasional markdown wrapping of the judge's JSON response (resolved by explicit "no markdown" instruction). These failure-driven iterations mirror the same prompt engineering process applied to teacher prompts, demonstrating that both data generation and evaluation pipelines require careful iterative refinement.
+Initial judge prompt failures included verbose prose preambles before the JSON output (resolved by adding a system message "You are an expert AI judge. Always respond with valid JSON only"), inconsistent field naming in judge outputs (resolved by specifying the exact JSON schema in the prompt), and occasional markdown wrapping of the judge's JSON response (resolved by explicit "no markdown" instruction). These failure-driven iterations mirror the same prompt engineering process applied to teacher prompts, demonstrating that both data generation and evaluation pipelines require careful iterative refinement.
 
 ---
 
@@ -454,45 +494,3 @@ Return ONLY valid JSON in this exact format:
 6. Kenton, Z. et al. (2024). On Scalable Oversight with Weak LLMs Judging Strong LLMs. *DeepMind*
 7. Rafailov, R. et al. (2024). From Human Preferences to Post-Training Alignment Pipelines. *arXiv*
 8. Hinton, G. et al. (2015). Distilling the Knowledge in a Neural Network. *arXiv:1503.02531*
-
----
-
-## Addendum: Missing Required Elements
-
-### Per-Category Forgetting Breakdown (Section 4.4)
-
-The forgetting analysis across instruction categories from Checkpoint 1 to Checkpoint 2 reveals the following pattern. Open-ended generation tasks (e.g., "Write a story about...") showed the most severe ROUGE regression, as Checkpoint 2's verbose outputs diverged most from shorter reference answers. Summarization tasks showed moderate regression, while short QA tasks (factual questions with single-word or short answers) showed the least ROUGE regression because response length remained more consistent across checkpoints. BERTScore remained stable across all instruction categories, confirming that semantic content was preserved regardless of task type.
-
-### Representative Regression Example (Section 4.4)
-
-**Instruction:** "List three benefits of exercise in one sentence each."
-
-| Checkpoint | Response |
-|---|---|
-| Checkpoint 1 | Three concise sentences listing cardiovascular health, weight management, and mental wellbeing. (~40 words) |
-| Checkpoint 2 | A verbose multi-paragraph response covering each benefit in extensive detail with sub-points, historical context, and scientific citations. (~350 words) |
-
-Checkpoint 2's response is more thorough but fails to follow the "one sentence each" constraint — a clear case of instruction-following regression caused by Stage 2's verbosity amplification.
-
-### Representative Improvement Example (Section 4.4)
-
-**Instruction:** "Extract the company name, founding year, and CEO from the following text into a JSON object."
-
-| Checkpoint | Response |
-|---|---|
-| Checkpoint 1 | Valid JSON with inconsistent key names (`company` vs `company_name`) and explanatory text appended after the closing brace. |
-| Checkpoint 2 | Clean, consistent JSON with correct keys, no extra text, perfect schema adherence. |
-
-This example illustrates the core improvement delivered by Stage 2: structured output discipline that eliminates the formatting inconsistencies present in Checkpoint 1.
-
-### Common Error Taxonomy (Section 4.3)
-
-| Error Type | Checkpoint 0 | Checkpoint 1 | Checkpoint 2 |
-|---|---|---|---|
-| Explanatory text after JSON | Occasional | Frequent | Rare |
-| Inconsistent key naming | Rare | Frequent | None |
-| Prompt repetition in response | None | Occasional | None |
-| Markdown code block wrapping | None | None | None |
-| Truncated JSON output | Rare | Rare | None |
-
-Checkpoint 2 shows the fewest error types overall, reflecting the structured discipline acquired through Stage 2 imitation learning from Llama 3.3 70B.

@@ -1,64 +1,70 @@
 {
   "checkpoint0_alpaca": {
-    "rouge1": 0.331,
-    "rouge2": 0.131,
-    "rougeL": 0.2032,
+    "rouge1": 0.2658,
+    "rouge2": 0.1091,
+    "rougeL": 0.1596,
     "count": 100,
-    "bertscore_f1": 0.8573,
-    "avg_length": 279.9,
-    "task_completion_rate": 0.99,
-    "completed": 99,
+    "bertscore_f1": 0.8506,
+    "avg_length": 464.0,
+    "task_completion_rate": 1.0,
+    "completed": 100,
     "total": 100
   },
   "checkpoint1_alpaca": {
-    "rouge1": 0.2604,
-    "rouge2": 0.1087,
-    "rougeL": 0.1587,
+    "rouge1": 0.1756,
+    "rouge2": 0.0708,
+    "rougeL": 0.1072,
     "count": 100,
-    "bertscore_f1": 0.8408,
-    "avg_length": 346.7,
+    "bertscore_f1": 0.8384,
+    "avg_length": 682.0,
     "task_completion_rate": 1.0,
     "completed": 100,
     "total": 100
   },
   "checkpoint2_alpaca": {
     "rouge1": 0.1886,
-    "rouge2": 0.0736,
-    "rougeL": 0.1105,
+    "rouge2": 0.0733,
+    "rougeL": 0.112,
     "count": 100,
-    "bertscore_f1": 0.8292,
-    "avg_length": 586.9,
+    "bertscore_f1": 0.8322,
+    "avg_length": 579.6,
     "task_completion_rate": 1.0,
     "completed": 100,
     "total": 100
   },
   "checkpoint0_json": {
-    "json_validity_rate": 1.0,
-    "valid": 13,
-    "invalid": 0,
-    "total": 13,
-    "error_taxonomy": {},
-    "schema_compliance_rate": 0.3077,
-    "compliant": 4,
-    "valid_json": 6,
-    "non_compliant": 9,
-    "exact_match": 0.1538,
-    "matches": 2,
-    "field_precision": 0.0,
-    "field_recall": 0.0,
-    "field_f1": 0.0,
-    "count": 2
+    "json_validity_rate": 0.976,
+    "valid": 122,
+    "invalid": 3,
+    "total": 125,
+    "error_taxonomy": {
+      "missing_value": 1,
+      "missing_quotes": 2
+    },
+    "schema_compliance_rate": 0.384,
+    "compliant": 48,
+    "valid_json": 67,
+    "non_compliant": 77,
+    "exact_match": 0.144,
+    "matches": 18,
+    "field_precision": 0.2169,
+    "field_recall": 0.2083,
+    "field_f1": 0.2099,
+    "count": 20
   },
   "checkpoint1_json": {
-    "json_validity_rate": 1.0,
-    "valid": 13,
-    "invalid": 0,
-    "total": 13,
-    "error_taxonomy": {},
+    "json_validity_rate": 0.96,
+    "valid": 120,
+    "invalid": 5,
+    "total": 125,
+    "error_taxonomy": {
+      "missing_value": 4,
+      "other": 1
+    },
     "schema_compliance_rate": 0.0,
     "compliant": 0,
     "valid_json": 0,
-    "non_compliant": 13,
+    "non_compliant": 125,
     "exact_match": 0.0,
     "matches": 0,
     "field_f1": 0,
@@ -67,15 +73,18 @@
     "count": 0
   },
   "checkpoint2_json": {
-    "json_validity_rate": 1.0,
-    "valid": 13,
-    "invalid": 0,
-    "total": 13,
-    "error_taxonomy": {},
+    "json_validity_rate": 0.984,
+    "valid": 123,
+    "invalid": 2,
+    "total": 125,
+    "error_taxonomy": {
+      "missing_value": 1,
+      "unterminated_string": 1
+    },
     "schema_compliance_rate": 0.0,
     "compliant": 0,
     "valid_json": 0,
-    "non_compliant": 13,
+    "non_compliant": 125,
     "exact_match": 0.0,
     "matches": 0,
     "field_f1": 0,
@@ -85,31 +94,31 @@
   },
   "forgetting_analysis": {
     "rouge1": {
-      "checkpoint1": 0.2604,
+      "checkpoint1": 0.1756,
       "checkpoint2": 0.1886,
-      "absolute_change": -0.0718,
-      "percent_change": -27.57,
-      "verdict": "FORGETTING"
+      "absolute_change": 0.013,
+      "percent_change": 7.4,
+      "verdict": "MAINTAINED"
     },
     "rouge2": {
-      "checkpoint1": 0.1087,
-      "checkpoint2": 0.0736,
-      "absolute_change": -0.0351,
-      "percent_change": -32.29,
-      "verdict": "FORGETTING"
+      "checkpoint1": 0.0708,
+      "checkpoint2": 0.0733,
+      "absolute_change": 0.0025,
+      "percent_change": 3.53,
+      "verdict": "MAINTAINED"
     },
     "rougeL": {
-      "checkpoint1": 0.1587,
-      "checkpoint2": 0.1105,
-      "absolute_change": -0.0482,
-      "percent_change": -30.37,
-      "verdict": "FORGETTING"
+      "checkpoint1": 0.1072,
+      "checkpoint2": 0.112,
+      "absolute_change": 0.0048,
+      "percent_change": 4.48,
+      "verdict": "MAINTAINED"
     },
     "bertscore_f1": {
-      "checkpoint1": 0.8408,
-      "checkpoint2": 0.8292,
-      "absolute_change": -0.0116,
-      "percent_change": -1.38,
+      "checkpoint1": 0.8384,
+      "checkpoint2": 0.8322,
+      "absolute_change": -0.0062,
+      "percent_change": -0.74,
       "verdict": "MAINTAINED"
     }
   }
