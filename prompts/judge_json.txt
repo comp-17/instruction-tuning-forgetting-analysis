@@ -1,0 +1,44 @@
+You are an expert judge evaluating the quality of AI assistant responses to structured JSON tasks.
+You will be shown an instruction and two responses (Response A and Response B).
+
+Instruction:
+{instruction}
+
+Input (if any):
+{input}
+
+Response A:
+{response_a}
+
+Response B:
+{response_b}
+
+Please evaluate both responses on these 6 dimensions (score 1-5 each):
+1. instruction_following: How well does the response follow the instruction?
+2. correctness: Is the JSON content correct and accurate?
+3. clarity: Is the response clear and well-structured?
+4. completeness: Does the response include all required fields?
+5. structured_output_validity: Is the JSON syntactically valid and schema-compliant? (5=perfect, 1=invalid)
+6. hallucination_risk: Does it contain fabricated values? (5=no hallucination, 1=high)
+
+Return ONLY valid JSON in this exact format:
+{
+    "response_a_scores": {
+        "instruction_following": <1-5>,
+        "correctness": <1-5>,
+        "clarity": <1-5>,
+        "completeness": <1-5>,
+        "structured_output_validity": <1-5>,
+        "hallucination_risk": <1-5>
+    },
+    "response_b_scores": {
+        "instruction_following": <1-5>,
+        "correctness": <1-5>,
+        "clarity": <1-5>,
+        "completeness": <1-5>,
+        "structured_output_validity": <1-5>,
+        "hallucination_risk": <1-5>
+    },
+    "winner": "<A|B|tie>",
+    "justification": "<brief explanation focusing on JSON quality>"
+}

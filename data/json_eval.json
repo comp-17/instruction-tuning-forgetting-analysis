@@ -1,0 +1,80 @@
+[
+  {
+    "instruction": "Extract all conference paper details from the following citation into a JSON object.",
+    "input": "Smith, J., Johnson, A., & Williams, R. (2023). Attention Mechanisms in Large Language Models: A Comprehensive Survey. In Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (ACL 2023), pp. 1234-1256. Toronto, Canada.",
+    "output": "{\n  \"title\": \"Attention Mechanisms in Large Language Models: A Comprehensive Survey\",\n  \"authors\": [\n    \"Smith, J.\",\n    \"Johnson, A.\",\n    \"Williams, R.\"\n  ],\n  \"year\": 2023,\n  \"conference\": \"61st Annual Meeting of the Association for Computational Linguistics\",\n  \"abbreviation\": \"ACL 2023\",\n  \"pages\": \"1234-1256\",\n  \"location\": \"Toronto, Canada\"\n}",
+    "task_type": "1. JSON Extraction"
+  },
+  {
+    "instruction": "Generate a valid JSON object conforming to the given podcast episode schema.",
+    "input": "{\"schema\": {\"episode_id\": \"string\", \"title\": \"string\", \"podcast_name\": \"string\", \"host\": \"string\", \"guests\": \"array of strings\", \"published_at\": \"string (ISO 8601)\", \"duration_seconds\": \"integer\", \"description\": \"string\", \"topics\": \"array of strings\", \"downloads\": \"integer\", \"rating\": \"number (0-5)\"}, \"context\": \"A popular AI technology podcast episode featuring a well-known researcher\"}",
+    "output": "{\n  \"episode_id\": \"AIT-2023-01\",\n  \"title\": \"Advancements in Natural Language Processing\",\n  \"podcast_name\": \"AI Today\",\n  \"host\": \"Dr. Rachel Kim\",\n  \"guests\": [\"Dr. John Smith\"],\n  \"published_at\": \"2023-02-20T14:30:00Z\",\n  \"duration_seconds\": 3600,\n  \"description\": \"In this episode, we explore the latest developments in NLP with renowned researcher Dr. John Smith.\",\n  \"topics\": [\"NLP\", \"AI\", \"Machine Learning\"],\n  \"downloads\": 15000,\n  \"rating\": 4.8\n}",
+    "task_type": "2. Schema-Constrained Generation"
+  },
+  {
+    "instruction": "Generate a JSON object representing a function call with the correct named parameters.",
+    "input": "{\"function_name\": \"send_notification\", \"description\": \"Send push notification to mobile app users\", \"parameters\": {\"user_ids\": \"array of strings or 'all' for broadcast\", \"title\": \"string (max 50 chars)\", \"body\": \"string (max 200 chars)\", \"data\": \"object (optional, custom payload)\", \"platform\": \"string: ios|android|both (default: both)\", \"badge_count\": \"integer (optional)\", \"sound\": \"string (optional, default: default)\", \"scheduled_at\": \"string (ISO 8601, optional: send immediately if not specified)\"}, \"context\": \"Send an order shipped notification to user user_789 for iOS and Android with their order number ORD-12345 in the data payload\"}",
+    "output": "{\n  \"function_name\": \"send_notification\",\n  \"parameters\": {\n    \"user_ids\": \"user_789\",\n    \"title\": \"Order Shipped\",\n    \"body\": \"Your order has been shipped. Order number: ORD-12345\",\n    \"data\": {\n      \"order_number\": \"ORD-12345\"\n    },\n    \"platform\": \"both\",\n    \"badge_count\": 1,\n    \"sound\": \"default\"\n  }\n}",
+    "task_type": "5. Tool-Call Generation"
+  },
+  {
+    "instruction": "Generate a valid JSON object conforming to the given machine learning model metadata schema.",
+    "input": "{\"schema\": {\"model_id\": \"string\", \"name\": \"string\", \"version\": \"string (semver)\", \"architecture\": \"string\", \"parameters\": \"integer\", \"training\": {\"dataset\": \"string\", \"epochs\": \"integer\", \"batch_size\": \"integer\", \"learning_rate\": \"number\"}, \"metrics\": {\"accuracy\": \"number (0-1)\", \"f1_score\": \"number (0-1)\", \"loss\": \"number\"}, \"created_at\": \"string (ISO 8601)\"}, \"context\": \"A text classification model trained on news articles\"}",
+    "output": "{\n  \"model_id\": \"TCM-001\",\n  \"name\": \"NewsClassifier\",\n  \"version\": \"1.2.3\",\n  \"architecture\": \"LSTM\",\n  \"parameters\": 1024,\n  \"training\": {\n    \"dataset\": \"NewsArticlesDataset\",\n    \"epochs\": 10,\n    \"batch_size\": 32,\n    \"learning_rate\": 0.001\n  },\n  \"metrics\": {\n    \"accuracy\": 0.92,\n    \"f1_score\": 0.90,\n    \"loss\": 0.15\n  },\n  \"created_at\": \"2023-03-01T12:00:00Z\"\n}",
+    "task_type": "2. Schema-Constrained Generation"
+  },
+  {
+    "instruction": "Generate a valid JSON object conforming to the given real-time chat message schema.",
+    "input": "{\"schema\": {\"message_id\": \"string (UUID)\", \"channel_id\": \"string\", \"sender\": {\"id\": \"string\", \"username\": \"string\", \"avatar_url\": \"string\"}, \"content\": \"string\", \"type\": \"string (text|image|file|system)\", \"timestamp\": \"string (ISO 8601)\", \"edited\": \"boolean\", \"edited_at\": \"string (ISO 8601) or null\", \"reactions\": \"array of objects with emoji and count\", \"reply_to\": \"string (message_id) or null\", \"read_by\": \"array of user IDs\"}, \"context\": \"A text message in a team project channel with reactions\"}",
+    "output": "{\n  \"message_id\": \"f47ac10f-58cc-4372-a567-0e02b2c3d479\",\n  \"channel_id\": \"team-project-123\",\n  \"sender\": {\n    \"id\": \"user-12345\",\n    \"username\": \"johnDoe\",\n    \"avatar_url\": \"https://example.com/johndoe/avatar.jpg\"\n  },\n  \"content\": \"Hello team, just a reminder that the project deadline is approaching.\",\n  \"type\": \"text\",\n  \"timestamp\": \"2023-03-01T14:30:00.000Z\",\n  \"edited\": false,\n  \"edited_at\": null,\n  \"reactions\": [\n    {\n      \"emoji\": \"\ud83d\udc4d\",\n      \"count\": 2\n    },\n    {\n      \"emoji\": \"\ud83e\udd14\",\n      \"count\": 1\n    }\n  ],\n  \"reply_to\": null,\n  \"read_by\": [\n    \"user-12345\",\n    \"user-67890\"\n  ]\n}",
+    "task_type": "2. Schema-Constrained Generation"
+  },
+  {
+    "instruction": "Fix the following malformed JSON and return only the corrected valid JSON.",
+    "input": "{\"recipe\": {\"name\": \"Pancakes\", \"servings\": 4, \"ingredients\": [{\"item\": \"flour\", \"amount\": \"2 cups\"}, {item: \"eggs\", \"amount\": \"2\"}, {\"item\": \"milk\", \"amount\": \"1.5 cups\"}], \"time_minutes\": 20}}",
+    "output": "{\"recipe\": {\"name\": \"Pancakes\", \"servings\": 4, \"ingredients\": [{\"item\": \"flour\", \"amount\": \"2 cups\"}, {\"item\": \"eggs\", \"amount\": \"2\"}, {\"item\": \"milk\", \"amount\": \"1.5 cups\"}], \"time_minutes\": 20}}",
+    "task_type": "4. JSON Repair"
+  },
+  {
+    "instruction": "Extract all flight information from the following itinerary into a structured JSON object.",
+    "input": "Flight AA1234 departs Dallas/Fort Worth (DFW) on November 15, 2023 at 08:30 AM and arrives in London Heathrow (LHR) at 10:45 PM local time. Aircraft: Boeing 777-300ER. Seat: 14A (Window). Confirmation code: XK9P2M.",
+    "output": "{\n  \"flight\": {\n    \"number\": \"AA1234\",\n    \"departure\": {\n      \"airport\": \"DFW\",\n      \"city\": \"Dallas/Fort Worth\",\n      \"date\": \"2023-11-15\",\n      \"time\": \"08:30 AM\"\n    },\n    \"arrival\": {\n      \"airport\": \"LHR\",\n      \"city\": \"London Heathrow\",\n      \"date\": \"2023-11-15\",\n      \"time\": \"10:45 PM\"\n    },\n    \"aircraft\": \"Boeing 777-300ER\",\n    \"seat\": {\n      \"number\": \"14A\",\n      \"type\": \"Window\"\n    },\n    \"confirmationCode\": \"XK9P2M\"\n  }\n}",
+    "task_type": "1. JSON Extraction"
+  },
+  {
+    "instruction": "Generate a valid JSON object conforming to the given IoT sensor reading schema.",
+    "input": "{\"schema\": {\"device_id\": \"string\", \"device_type\": \"string\", \"location\": {\"building\": \"string\", \"room\": \"string\", \"floor\": \"integer\"}, \"timestamp\": \"string (ISO 8601)\", \"readings\": {\"temperature_c\": \"number\", \"humidity_percent\": \"number (0-100)\", \"co2_ppm\": \"integer\", \"light_lux\": \"integer\"}, \"battery_level\": \"number (0-1)\", \"status\": \"string (online|offline|warning)\"}, \"context\": \"A smart office environmental sensor showing slightly elevated CO2\"}",
+    "output": "{\n  \"device_id\": \"sensor_001\",\n  \"device_type\": \"environmental\",\n  \"location\": {\n    \"building\": \"Main Office\",\n    \"room\": \"Conference Room\",\n    \"floor\": 2\n  },\n  \"timestamp\": \"2023-03-09T14:30:00Z\",\n  \"readings\": {\n    \"temperature_c\": 22.5,\n    \"humidity_percent\": 60,\n    \"co2_ppm\": 1200,\n    \"light_lux\": 500\n  },\n  \"battery_level\": 0.8,\n  \"status\": \"online\"\n}",
+    "task_type": "2. Schema-Constrained Generation"
+  },
+  {
+    "instruction": "Extract all patent information from the following patent filing into a JSON object.",
+    "input": "Patent Application US20230123456A1. Title: Method and System for Efficient Attention Computation in Transformer Neural Networks. Inventors: John Smith, Jane Doe. Assignee: Tech Innovation Corp. Filing Date: March 15, 2023. Abstract: A novel approach to reducing computational complexity of attention mechanisms from O(n\u00b2) to O(n log n).",
+    "output": "{\n  \"patent\": {\n    \"application\": \"US20230123456A1\",\n    \"title\": \"Method and System for Efficient Attention Computation in Transformer Neural Networks\",\n    \"inventors\": [\n      \"John Smith\",\n      \"Jane Doe\"\n    ],\n    \"assignee\": \"Tech Innovation Corp\",\n    \"filingDate\": \"March 15, 2023\",\n    \"abstract\": \"A novel approach to reducing computational complexity of attention mechanisms from O(n\u00b2) to O(n log n)\"\n  }\n}",
+    "task_type": "1. JSON Extraction"
+  },
+  {
+    "instruction": "Generate a valid JSON object conforming to the given API error response schema.",
+    "input": "{\"schema\": {\"error\": {\"code\": \"integer (HTTP status code)\", \"type\": \"string\", \"message\": \"string\", \"details\": \"array of objects with field and message\", \"timestamp\": \"string (ISO 8601)\", \"request_id\": \"string (UUID)\"}}, \"context\": \"A 422 validation error for a user registration form with invalid email and short password\"}",
+    "output": "{\"error\": {\"code\": 422, \"type\": \"validation_error\", \"message\": \"Validation failed\", \"details\": [{\"field\": \"email\", \"message\": \"Invalid email address\"}, {\"field\": \"password\", \"message\": \"Password is too short\"}], \"timestamp\": \"2023-12-01T12:00:00Z\", \"request_id\": \"f47ac10b-58cc-4372-a567-0e02b2c3d479\"}}",
+    "task_type": "2. Schema-Constrained Generation"
+  },
+  {
+    "instruction": "Fix the following malformed JSON and return only the corrected valid JSON.",
+    "input": "{'task': {'id': 'TASK-2023-456', 'title': 'Implement authentication', 'assignee': 'Sarah Chen', 'priority': 'high', 'status': 'in_progress', 'due_date': '2023-11-15', 'subtasks': ['Design OAuth flow', 'Implement JWT', 'Write tests',], 'story_points': 8}}",
+    "output": "{\"task\": {\"id\": \"TASK-2023-456\", \"title\": \"Implement authentication\", \"assignee\": \"Sarah Chen\", \"priority\": \"high\", \"status\": \"in_progress\", \"due_date\": \"2023-11-15\", \"subtasks\": [\"Design OAuth flow\", \"Implement JWT\", \"Write tests\"], \"story_points\": 8}}",
+    "task_type": "4. JSON Repair"
+  },
+  {
+    "instruction": "Classify the intent of the following customer service message. Return a JSON object with label, confidence, and reason.",
+    "input": "{\"text\": \"Hi, I ordered a blue shirt size L two weeks ago but received a red shirt size M instead. I need to return this and get the correct item.\", \"labels\": [\"refund_request\", \"exchange_request\", \"complaint\", \"inquiry\", \"compliment\", \"cancellation\"]}",
+    "output": "{\"label\": \"exchange_request\", \"confidence\": 0.9, \"reason\": \"The customer explicitly states they need to return the incorrect item and get the correct one, indicating a desire to exchange the product.\"}",
+    "task_type": "3. Classification with JSON"
+  },
+  {
+    "instruction": "Generate a JSON object representing a function call with the correct named parameters.",
+    "input": "{\"function_name\": \"generate_invoice\", \"description\": \"Generate a PDF invoice for billing\", \"parameters\": {\"invoice_number\": \"string\", \"issue_date\": \"string (YYYY-MM-DD)\", \"due_date\": \"string (YYYY-MM-DD)\", \"seller\": \"object with name, address, email, tax_id\", \"buyer\": \"object with name, address, email\", \"line_items\": \"array of objects with description, quantity, unit_price\", \"tax_rate\": \"number (0-1, optional)\", \"discount\": \"number (optional, amount in currency)\", \"currency\": \"string (ISO 4217, default: USD)\", \"notes\": \"string (optional)\", \"template\": \"string: standard|professional|minimal (default: standard)\"}, \"context\": \"Generate an invoice INV-2023-100 from TechCorp LLC to ClientCo Inc for 10 hours of consulting at $200/hr and software license for $500, with 8.25% tax, due in 30 days\"}",
+    "output": "{\n  \"function_name\": \"generate_invoice\",\n  \"parameters\": {\n    \"invoice_number\": \"INV-2023-100\",\n    \"issue_date\": \"2023-09-16\",\n    \"due_date\": \"2023-10-16\",\n    \"seller\": {\n      \"name\": \"TechCorp LLC\",\n      \"address\": \"123 Main St, Anytown, USA 12345\",\n      \"email\": \"info@techcorp.com\",\n      \"tax_id\": \"123456789\"\n    },\n    \"buyer\": {\n      \"name\": \"ClientCo Inc\",\n      \"address\": \"456 Elm St, Othertown, USA 67890\",\n      \"email\": \"info@clientco.com\"\n    },\n    \"line_items\": [\n      {\n        \"description\": \"Consulting services\",\n        \"quantity\": 10,\n        \"unit_price\": 200.0\n      },\n      {\n        \"description\": \"Software license\",\n        \"quantity\": 1,\n        \"unit_price\": 500.0\n      }\n    ],\n    \"tax_rate\": 0.0825,\n    \"currency\": \"USD\",\n    \"template\": \"standard\"\n  }\n}",
+    "task_type": "5. Tool-Call Generation"
+  }
+]

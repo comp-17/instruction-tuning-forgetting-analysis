@@ -1,0 +1,44 @@
+[
+  {
+    "variant": "epochs_1",
+    "config": {
+      "name": "epochs_1",
+      "epochs": 1,
+      "lr": 2e-05,
+      "data_pct": 1.0
+    },
+    "metrics": {
+      "rouge_l": 0.1782,
+      "json_validity": 0.4615,
+      "exact_match": 0.0
+    }
+  },
+  {
+    "variant": "epochs_2",
+    "config": {
+      "name": "epochs_2",
+      "epochs": 2,
+      "lr": 2e-05,
+      "data_pct": 1.0
+    },
+    "metrics": {
+      "rouge_l": 0.1782,
+      "json_validity": 0.4615,
+      "exact_match": 0.0
+    }
+  },
+  {
+    "variant": "epochs_3",
+    "config": {
+      "name": "epochs_3",
+      "epochs": 3,
+      "lr": 2e-05,
+      "data_pct": 1.0
+    },
+    "metrics": {
+      "rouge_l": 0.1784,
+      "json_validity": 0.4615,
+      "exact_match": 0.0
+    }
+  }
+]

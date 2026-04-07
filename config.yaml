@@ -1,0 +1,110 @@
+# Assignment 3 - Two-Stage Sequential Instruction Tuning
+# All hyperparameters in one place as required by assignment
+
+# ── Student Model ──────────────────────────────────────────────
+model:
+  student: "microsoft/Phi-3.5-mini-instruct"
+  teacher: "Llama-3.3-70B-Instruct-awq"
+  judge: "Llama-3.3-70B-Instruct-awq"
+
+# ── LoRA Configuration ─────────────────────────────────────────
+lora:
+  rank: 16
+  alpha: 32
+  dropout: 0.05
+  target_modules: "all-linear"
+  bias: "none"
+  task_type: "CAUSAL_LM"
+
+# ── Stage 1 Training (Alpaca) ──────────────────────────────────
+stage1:
+  dataset: "yahma/alpaca-cleaned"
+  train_file: "data/alpaca_train.json"
+  eval_file: "data/alpaca_eval.json"
+  output_dir: "outputs/stage1"
+  num_epochs: 2
+  learning_rate: 0.00002
+  batch_size: 4
+  gradient_accumulation_steps: 4
+  max_seq_length: 1024
+  warmup_ratio: 0.03
+  lr_scheduler: "cosine"
+  save_steps: 50
+  logging_steps: 5
+  precision: "fp16"
+  quantization: "4bit"
+
+# ── Stage 2 Training (Teacher JSON) ───────────────────────────
+stage2:
+  train_file: "data/json_train.json"
+  eval_file: "data/json_eval.json"
+  output_dir: "outputs/stage2"
+  stage1_checkpoint: "outputs/stage1/final"
+  num_epochs: 10
+  learning_rate: 0.00002
+  batch_size: 4
+  gradient_accumulation_steps: 4
+  max_seq_length: 1024
+  warmup_ratio: 0.03
+  lr_scheduler: "cosine"
+  save_steps: 50
+  logging_steps: 5
+  precision: "fp16"
+  quantization: "4bit"
+
+# ── Evaluation ─────────────────────────────────────────────────
+evaluation:
+  alpaca_eval_size: 100
+  json_eval_size: 100
+  max_new_tokens: 512
+  temperature: 0.1
+  do_sample: false
+  checkpoints:
+    - name: "checkpoint0"
+      description: "Untuned base model"
+      adapter: null
+    - name: "checkpoint1"
+      description: "After Stage 1 Alpaca fine-tuning"
+      adapter: "outputs/stage1/final"
+    - name: "checkpoint2"
+      description: "After Stage 2 Teacher JSON fine-tuning"
+      adapter: "outputs/stage2/final"
+
+# ── Judge Configuration ────────────────────────────────────────
+judge:
+  dimensions:
+    - "instruction_following"
+    - "correctness"
+    - "clarity"
+    - "completeness"
+    - "structured_output_validity"
+    - "hallucination_risk"
+  score_range: "1-5"
+  randomize_order: true
+  comparisons:
+    - ["checkpoint0", "checkpoint1"]
+    - ["checkpoint1", "checkpoint2"]
+    - ["checkpoint0", "checkpoint2"]
+
+# ── UTSA API ───────────────────────────────────────────────────
+api:
+  model_8b: "meta-llama/Llama-3.1-8B-Instruct"
+  base_url_8b: "http://149.165.173.247:8888/v1"
+  model_70b: "llama-3.3-70b-instruct-awq"
+  base_url_70b: "http://10.246.100.230/v1"
+
+# ── Paths ──────────────────────────────────────────────────────
+paths:
+  base_dir: "/work/fpb170/assignment3"
+  data_dir: "/work/fpb170/assignment3/data"
+  outputs_dir: "/work/fpb170/assignment3/outputs"
+  results_dir: "/work/fpb170/assignment3/results"
+  prompts_dir: "/work/fpb170/assignment3/prompts"
+  scripts_dir: "/work/fpb170/assignment3/scripts"
+  hf_cache: "/work/fpb170/hf_cache"
+
+# ── W&B ────────────────────────────────────────────────────────
+wandb:
+  project: "assignment3"
+  stage1_run: "stage1_alpaca"
+  stage2_run: "stage2_teacher_json"

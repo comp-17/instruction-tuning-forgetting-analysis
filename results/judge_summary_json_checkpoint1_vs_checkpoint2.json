@@ -1,0 +1,27 @@
+{
+  "checkpoint_a": "checkpoint1",
+  "checkpoint_b": "checkpoint2",
+  "total_comparisons": 13,
+  "wins_a": 3,
+  "wins_b": 7,
+  "ties": 3,
+  "win_rate_a": 0.231,
+  "win_rate_b": 0.538,
+  "tie_rate": 0.231,
+  "avg_scores_a": {
+    "instruction_following": 3.85,
+    "correctness": 4.08,
+    "clarity": 4.23,
+    "completeness": 4.23,
+    "structured_output_validity": 4.77,
+    "hallucination_risk": 4.85
+  },
+  "avg_scores_b": {
+    "instruction_following": 4.77,
+    "correctness": 5.0,
+    "clarity": 4.92,
+    "completeness": 4.77,
+    "structured_output_validity": 5.0,
+    "hallucination_risk": 5.0
+  }
+}

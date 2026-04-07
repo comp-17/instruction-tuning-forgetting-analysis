@@ -1,0 +1,83 @@
+[
+  {
+    "checkpoint_a": "checkpoint0",
+    "checkpoint_b": "checkpoint1",
+    "total_comparisons": 13,
+    "wins_a": 7,
+    "wins_b": 3,
+    "ties": 3,
+    "win_rate_a": 0.538,
+    "win_rate_b": 0.231,
+    "tie_rate": 0.231,
+    "avg_scores_a": {
+      "instruction_following": 4.69,
+      "correctness": 4.69,
+      "clarity": 4.77,
+      "completeness": 4.69,
+      "structured_output_validity": 5.0,
+      "hallucination_risk": 4.92
+    },
+    "avg_scores_b": {
+      "instruction_following": 3.38,
+      "correctness": 4.08,
+      "clarity": 4.46,
+      "completeness": 4.23,
+      "structured_output_validity": 4.62,
+      "hallucination_risk": 4.08
+    }
+  },
+  {
+    "checkpoint_a": "checkpoint1",
+    "checkpoint_b": "checkpoint2",
+    "total_comparisons": 13,
+    "wins_a": 3,
+    "wins_b": 7,
+    "ties": 3,
+    "win_rate_a": 0.231,
+    "win_rate_b": 0.538,
+    "tie_rate": 0.231,
+    "avg_scores_a": {
+      "instruction_following": 3.85,
+      "correctness": 4.08,
+      "clarity": 4.23,
+      "completeness": 4.23,
+      "structured_output_validity": 4.77,
+      "hallucination_risk": 4.85
+    },
+    "avg_scores_b": {
+      "instruction_following": 4.77,
+      "correctness": 5.0,
+      "clarity": 4.92,
+      "completeness": 4.77,
+      "structured_output_validity": 5.0,
+      "hallucination_risk": 5.0
+    }
+  },
+  {
+    "checkpoint_a": "checkpoint0",
+    "checkpoint_b": "checkpoint2",
+    "total_comparisons": 13,
+    "wins_a": 5,
+    "wins_b": 4,
+    "ties": 4,
+    "win_rate_a": 0.385,
+    "win_rate_b": 0.308,
+    "tie_rate": 0.308,
+    "avg_scores_a": {
+      "instruction_following": 4.38,
+      "correctness": 4.62,
+      "clarity": 4.77,
+      "completeness": 4.62,
+      "structured_output_validity": 4.92,
+      "hallucination_risk": 4.85
+    },
+    "avg_scores_b": {
+      "instruction_following": 4.0,
+      "correctness": 4.69,
+      "clarity": 4.77,
+      "completeness": 4.54,
+      "structured_output_validity": 5.0,
+      "hallucination_risk": 4.77
+    }
+  }
+]

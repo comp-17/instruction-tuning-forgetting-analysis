@@ -1,0 +1,116 @@
+{
+  "checkpoint0_alpaca": {
+    "rouge1": 0.331,
+    "rouge2": 0.131,
+    "rougeL": 0.2032,
+    "count": 100,
+    "bertscore_f1": 0.8573,
+    "avg_length": 279.9,
+    "task_completion_rate": 0.99,
+    "completed": 99,
+    "total": 100
+  },
+  "checkpoint1_alpaca": {
+    "rouge1": 0.2604,
+    "rouge2": 0.1087,
+    "rougeL": 0.1587,
+    "count": 100,
+    "bertscore_f1": 0.8408,
+    "avg_length": 346.7,
+    "task_completion_rate": 1.0,
+    "completed": 100,
+    "total": 100
+  },
+  "checkpoint2_alpaca": {
+    "rouge1": 0.1886,
+    "rouge2": 0.0736,
+    "rougeL": 0.1105,
+    "count": 100,
+    "bertscore_f1": 0.8292,
+    "avg_length": 586.9,
+    "task_completion_rate": 1.0,
+    "completed": 100,
+    "total": 100
+  },
+  "checkpoint0_json": {
+    "json_validity_rate": 1.0,
+    "valid": 13,
+    "invalid": 0,
+    "total": 13,
+    "error_taxonomy": {},
+    "schema_compliance_rate": 0.3077,
+    "compliant": 4,
+    "valid_json": 6,
+    "non_compliant": 9,
+    "exact_match": 0.1538,
+    "matches": 2,
+    "field_precision": 0.0,
+    "field_recall": 0.0,
+    "field_f1": 0.0,
+    "count": 2
+  },
+  "checkpoint1_json": {
+    "json_validity_rate": 1.0,
+    "valid": 13,
+    "invalid": 0,
+    "total": 13,
+    "error_taxonomy": {},
+    "schema_compliance_rate": 0.0,
+    "compliant": 0,
+    "valid_json": 0,
+    "non_compliant": 13,
+    "exact_match": 0.0,
+    "matches": 0,
+    "field_f1": 0,
+    "field_precision": 0,
+    "field_recall": 0,
+    "count": 0
+  },
+  "checkpoint2_json": {
+    "json_validity_rate": 1.0,
+    "valid": 13,
+    "invalid": 0,
+    "total": 13,
+    "error_taxonomy": {},
+    "schema_compliance_rate": 0.0,
+    "compliant": 0,
+    "valid_json": 0,
+    "non_compliant": 13,
+    "exact_match": 0.0,
+    "matches": 0,
+    "field_f1": 0,
+    "field_precision": 0,
+    "field_recall": 0,
+    "count": 0
+  },
+  "forgetting_analysis": {
+    "rouge1": {
+      "checkpoint1": 0.2604,
+      "checkpoint2": 0.1886,
+      "absolute_change": -0.0718,
+      "percent_change": -27.57,
+      "verdict": "FORGETTING"
+    },
+    "rouge2": {
+      "checkpoint1": 0.1087,
+      "checkpoint2": 0.0736,
+      "absolute_change": -0.0351,
+      "percent_change": -32.29,
+      "verdict": "FORGETTING"
+    },
+    "rougeL": {
+      "checkpoint1": 0.1587,
+      "checkpoint2": 0.1105,
+      "absolute_change": -0.0482,
+      "percent_change": -30.37,
+      "verdict": "FORGETTING"
+    },
+    "bertscore_f1": {
+      "checkpoint1": 0.8408,
+      "checkpoint2": 0.8292,
+      "absolute_change": -0.0116,
+      "percent_change": -1.38,
+      "verdict": "MAINTAINED"
+    }
+  }
+}

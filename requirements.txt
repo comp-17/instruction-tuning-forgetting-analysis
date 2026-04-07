@@ -1,0 +1,36 @@
+# Assignment 3 - Two-Stage Sequential Instruction Tuning
+# Python 3.10
+
+# Core ML libraries
+torch==2.3.0
+torchvision==0.18.0
+transformers==4.44.0
+datasets==4.8.4
+peft==0.12.0
+trl==0.10.1
+accelerate==1.13.0
+bitsandbytes==0.43.0
+
+# HuggingFace
+huggingface-hub==0.36.2
+safetensors==0.7.0
+tokenizers==0.19.1
+
+# Evaluation metrics
+rouge-score==0.1.2
+bert-score==0.3.13
+nltk==3.9.4
+
+# API client
+openai==2.30.0
+
+# Experiment tracking
+wandb==0.25.1
+
+# Utilities
+numpy==2.2.6
+pandas==2.3.3
+pyyaml==6.0.3
+tqdm==4.67.3
+scikit-learn==1.6.1
+matplotlib==3.10.8
