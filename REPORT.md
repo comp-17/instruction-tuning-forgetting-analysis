@@ -134,6 +134,14 @@ Checkpoint 2 wins 49% of comparisons against Checkpoint 1, while C1 wins only 25
 | Avg output length (words) | 464.0 | 682.0 | 579.6 |
 | Task completion rate | **1.0** | **1.0** | **1.0** |
 
+**Figure 5: ROUGE-L Across Three Checkpoints**
+![ROUGE-L Comparison](figures/rouge_l_comparison.png)
+*ROUGE-L scores at each checkpoint. Checkpoint 2 scores higher than Checkpoint 1, confirming no catastrophic forgetting on general instruction tasks.*
+
+**Figure 6: BERTScore F1 Across Three Checkpoints**
+![BERTScore Comparison](figures/bertscore_comparison.png)
+*BERTScore F1 remains stable across all three checkpoints (range: 0.8322–0.8506), indicating strong semantic content preservation throughout the two-stage pipeline.*
+
 ### 2.3 JSON Structured Output Evaluation
 
 For JSON tasks, Checkpoint 2 demonstrates clear improvement over Checkpoint 1, achieving near-perfect structured output validity scores. The base model (C0) and Checkpoint 2 are nearly tied in pairwise comparisons (34.4% vs 35.2%), demonstrating that Stage 2 training successfully recovered JSON capability to the level of the untuned base model.
@@ -166,6 +174,10 @@ For JSON tasks, Checkpoint 2 demonstrates clear improvement over Checkpoint 1, a
 | Exact Match | 14.4% | 0% | 0% |
 | Field F1 | 0.2099 | 0.0 | 0.0 |
 
+**Figure 7: JSON Validity Rate Across Three Checkpoints**
+![JSON Validity Comparison](figures/json_validity_comparison.png)
+*JSON validity rates across all three checkpoints. All models achieve high validity (96–98.4%), with Checkpoint 2 reaching the highest rate after Stage 2 JSON fine-tuning.*
+
 **Error taxonomy:**
 
 | Error Type | Checkpoint 0 | Checkpoint 1 | Checkpoint 2 |
@@ -190,6 +202,10 @@ The central analytical result of this work is presented below — the direct com
 | Judge Win Rate (C2 vs C1) | — | **49.0%** | — | — | **IMPROVED** |
 
 **Key finding: No catastrophic forgetting occurred.** All ROUGE metrics improved from Checkpoint 1 to Checkpoint 2, and BERTScore dropped by only 0.7%. The judge strongly prefers Checkpoint 2 over Checkpoint 1 (49% vs 25% win rate). Stage 2 JSON fine-tuning not only avoided forgetting but slightly improved general instruction quality.
+
+**Figure 8: Forgetting Analysis — Checkpoint 1 vs Checkpoint 2**
+![Forgetting Analysis](figures/forgetting_analysis.png)
+*Side-by-side comparison of automatic metrics at Checkpoint 1 and Checkpoint 2. All metrics are maintained or improved, with no evidence of catastrophic forgetting.*
 
 **Per-category breakdown:** The 100 held-out Alpaca prompts span multiple instruction types. Representative categories and their behavior are described below:
 

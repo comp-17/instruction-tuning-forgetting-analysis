@@ -68,6 +68,16 @@ instruction-tuning-forgetting-analysis/
 │   ├── slurm_stage1.sh          # UTSA HPC SLURM batch script — Stage 1
 │   └── slurm_stage2.sh          # UTSA HPC SLURM batch script — Stage 2
 │
+├── figures/
+│   ├── stage1_train_loss.png    # W&B Stage 1 training loss curve
+│   ├── stage1_eval_loss.png     # W&B Stage 1 evaluation loss curve
+│   ├── stage2_train_loss.png    # W&B Stage 2 training loss curve
+│   ├── stage2_eval_loss.png     # W&B Stage 2 evaluation loss curve
+│   ├── rouge_l_comparison.png   # ROUGE-L across three checkpoints (auto-generated)
+│   ├── bertscore_comparison.png # BERTScore across three checkpoints (auto-generated)
+│   ├── json_validity_comparison.png # JSON validity across checkpoints (auto-generated)
+│   └── forgetting_analysis.png  # C1 vs C2 forgetting analysis (auto-generated)
+│
 ├── prepare_alpaca.py            # Stage 1 data preparation
 ├── generate_teacher_data.py     # Imitation learning pipeline (Stage 2 data)
 ├── train_stage1.py              # Stage 1 QLoRA training
@@ -76,6 +86,7 @@ instruction-tuning-forgetting-analysis/
 ├── judge_eval.py                # LLM-as-a-Judge pairwise evaluation
 ├── compute_metrics.py           # Automatic metrics computation
 ├── ablation.py                  # Ablation study runner
+├── generate_figures.py          # Auto-generates all result figures from metrics
 │
 └── results/
     ├── checkpoint0_alpaca.json  # Checkpoint 0 outputs on Alpaca eval
@@ -181,6 +192,9 @@ python compute_metrics.py
 
 # 10. Run ablation study
 python ablation.py --ablation epochs
+
+# 11. Generate all result figures
+python generate_figures.py
 ```
 
 ### Running via SLURM (Batch Jobs)
