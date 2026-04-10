@@ -82,10 +82,11 @@ instruction-tuning-forgetting-analysis/
 ├── generate_teacher_data.py     # Imitation learning pipeline (Stage 2 data)
 ├── train_stage1.py              # Stage 1 QLoRA training
 ├── train_stage2.py              # Stage 2 QLoRA training
+├── train_combined.py            # Combined training ablation (joint Alpaca + JSON)
 ├── inference.py                 # Response generation at each checkpoint
 ├── judge_eval.py                # LLM-as-a-Judge pairwise evaluation
 ├── compute_metrics.py           # Automatic metrics computation
-├── ablation.py                  # Ablation study runner
+├── ablation.py                  # Ablation study runner (epochs)
 ├── generate_figures.py          # Auto-generates all result figures from metrics
 │
 └── results/
@@ -190,10 +191,16 @@ python judge_eval.py --comparison all
 # 9. Compute all automatic metrics
 python compute_metrics.py
 
-# 10. Run ablation study
+# 10. Run ablation study (epochs)
 python ablation.py --ablation epochs
 
-# 11. Generate all result figures
+# 11. Run combined training ablation
+python train_combined.py
+
+# 12. Run inference on combined checkpoint
+python inference.py --checkpoint combined
+
+# 13. Generate all result figures
 python generate_figures.py
 ```
 
@@ -262,7 +269,8 @@ sbatch scripts/slurm_stage2.sh
 |---|---|---|---|---|
 | Checkpoint 0 (base) | 0.1596 | 0.8506 | 97.6% | 80.0% (vs C1) |
 | Checkpoint 1 (Alpaca) | 0.1072 | 0.8384 | 96.0% | 11.0% (vs C0) |
-| Checkpoint 2 (JSON) | 0.1120 | 0.8322 | 98.4% | 49.0% (vs C1) |
+| Checkpoint 2 (Sequential JSON) | **0.1120** | 0.8322 | **98.4%** | 49.0% (vs C1) |
+| Combined (Joint training) | 0.1083 | 0.8370 | 97.6% | 30.0% (vs C2) |
 
 ### Forgetting Analysis (C1 → C2)
 
@@ -271,6 +279,15 @@ sbatch scripts/slurm_stage2.sh
 | ROUGE-L | +4.5% | MAINTAINED |
 | BERTScore F1 | −0.7% | MAINTAINED |
 | Judge Win Rate | C2 wins 49% vs C1's 25% | IMPROVED |
+
+### Combined Training Ablation (Sequential vs Joint)
+
+| Comparison | Sequential C2 Wins | Combined Wins | Verdict |
+|---|---|---|---|
+| Alpaca evaluation | **42.0%** | 30.0% | Sequential wins |
+| JSON evaluation | **35.2%** | 18.4% | Sequential wins |
+
+**Key finding:** Sequential two-stage training consistently outperforms joint combined training, validating the two-stage pipeline design.
 
 ### JSON Judge Scores (Checkpoint 2)
 
@@ -290,11 +307,11 @@ sbatch scripts/slurm_stage2.sh
 | Detail | Value |
 |---|---|
 | Cluster | UTSA ARC |
-| Node | gpu015 |
 | GPU | Tesla V100S-PCIE-32GB |
 | CUDA | 12.3 |
 | Stage 1 training time | ~4 hours |
 | Stage 2 training time | ~6 minutes |
+| Combined training time | ~4 hours |
 | Job scheduler | SLURM |
 
 ---

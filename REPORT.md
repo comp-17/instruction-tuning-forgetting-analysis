@@ -253,6 +253,42 @@ To understand how training duration influences the forgetting/retention tradeoff
 
 The result is striking in its uniformity: all three variants produced identical JSON validity and nearly identical ROUGE-L scores. For this small dataset, model behavior is determined by training data content rather than the number of training passes in the 1-3 range. This finding justified using 10 epochs in the primary Stage 2 run, providing sufficient gradient steps for meaningful adaptation while confirming that short epoch counts do not cause forgetting on this dataset scale.
 
+### 2.6 Ablation Study: Sequential vs Combined Training
+
+A second ablation was conducted to directly compare the two-stage sequential pipeline against a single combined training run on the merged Alpaca and teacher-generated JSON dataset. The purpose of this ablation, as specified in the assignment, is to identify which training decisions most strongly influence the forgetting/retention tradeoff.
+
+The central question is: does training on both datasets simultaneously in a single stage produce better JSON accuracy while retaining Alpaca capability, compared to the sequential approach of training on each dataset in separate stages?
+
+**Combined training configuration:**
+- Dataset: Alpaca-Cleaned (46,584 examples) + Teacher JSON (112 examples) merged and shuffled
+- Total training examples: 46,696
+- Epochs: 2, Learning rate: 2e-5, Batch size: 4, Max seq length: 1024
+- Total steps: 5,836
+
+**Automatic metrics — Alpaca retention and JSON accuracy:**
+
+| Checkpoint | ROUGE-L | BERTScore F1 | JSON Validity | Avg Length |
+|---|---|---|---|---|
+| Checkpoint 1 (Stage 1 only) | 0.1072 | 0.8384 | 96.0% | 682.0 |
+| Checkpoint 2 (Sequential Stage 1→2) | **0.1120** | 0.8322 | **98.4%** | 579.6 |
+| Combined (Joint training) | 0.1083 | **0.8370** | 97.6% | 684.2 |
+
+**Judge-based comparison — Alpaca retention:**
+
+| Comparison | Sequential Wins | Combined Wins | Ties | Verdict |
+|---|---|---|---|---|
+| Checkpoint 2 vs Combined | **42.0%** | 30.0% | 28.0% | Sequential retains better |
+| Checkpoint 1 vs Combined | 24.0% | **35.0%** | 41.0% | Combined retains better than C1 |
+
+**Judge-based comparison — JSON accuracy:**
+
+| Comparison | Sequential Wins | Combined Wins | Ties | Verdict |
+|---|---|---|---|---|
+| Checkpoint 2 vs Combined | **35.2%** | 18.4% | 46.4% | Sequential better at JSON |
+| Checkpoint 1 vs Combined | 16.0% | **25.6%** | 58.4% | Combined better than C1 at JSON |
+
+**Finding — Sequential training dominates on both retention and accuracy:** Sequential two-stage training (Checkpoint 2) outperforms combined joint training on both Alpaca retention (42% vs 30% win rate) and JSON accuracy (35.2% vs 18.4% win rate). This is the most important finding of the ablation study: the two-stage sequential curriculum provides a superior forgetting/retention tradeoff compared to joint training. Combined training performs better than Alpaca-only training (Checkpoint 1) on both metrics, confirming that JSON data exposure is beneficial regardless of training order. However, the sequential approach of first mastering general instruction following and then specializing on structured outputs yields better overall performance than simultaneous exposure to both datasets. This suggests that the order and staging of post-training data matters significantly — a finding directly relevant to post-training pipeline design in practice.
+
 ---
 
 ## Section 3: Analysis
@@ -273,7 +309,7 @@ The results connect directly to the post-training and alignment concepts discuss
 
 **Catastrophic forgetting** did not occur in this pipeline. All ROUGE metrics improved from Checkpoint 1 to Checkpoint 2 (+4.5% ROUGE-L), and BERTScore dropped by only 0.7%. This finding challenges the naive expectation that sequential fine-tuning on a specialized dataset inevitably degrades general capabilities. The small size of the Stage 2 dataset (112 examples × 70 gradient steps) appears to have been insufficient to cause destructive interference with Stage 1 representations. This is consistent with recent findings in the alignment literature: catastrophic forgetting is more pronounced with large-scale domain shifts than with small, targeted adaptations. When the specialized dataset is small and well-curated, sequential fine-tuning can be additive rather than destructive.
 
-**Sequential fine-tuning** in this pipeline demonstrates that targeted specialization on a small, high-quality dataset can improve rather than degrade general capability. Stage 2 training not only improved JSON performance (C2 wins 36.8% vs C1's 22.4% on JSON tasks) but also improved general instruction quality (C2 wins 49% vs C1's 25% on Alpaca tasks). This supports the view that learning structured output discipline from a stronger teacher can positively regularize the model's general response behavior — producing more focused and informative outputs across all task types.
+**Sequential fine-tuning** in this pipeline demonstrates that targeted specialization on a small, high-quality dataset can improve rather than degrade general capability. Stage 2 training not only improved JSON performance (C2 wins 36.8% vs C1's 22.4% on JSON tasks) but also improved general instruction quality (C2 wins 49% vs C1's 25% on Alpaca tasks). This supports the view that learning structured output discipline from a stronger teacher can positively regularize the model's general response behavior — producing more focused and informative outputs across all task types. Furthermore, the combined training ablation (Section 2.6) confirms that the sequential two-stage design is superior to joint training: Checkpoint 2 wins 42% of Alpaca comparisons against the combined model (vs 30%), and 35.2% of JSON comparisons (vs 18.4%). The sequential curriculum — general alignment first, then domain specialization — provides a better learning trajectory than simultaneous exposure to both datasets.
 
 **Imitation learning from stronger models** proved effective for structured output acquisition. The near-parity between Checkpoint 0 and Checkpoint 2 on JSON tasks (34.4% vs 35.2% win rate) demonstrates that 70 gradient steps on 112 teacher-generated examples was sufficient to bring the 3.8B student model to the level of the untuned base model on structured tasks. This supports the practical utility of black-box distillation as an alignment technique, particularly for tasks where the target behavior is well-defined and verifiable (such as JSON validity). The teacher's formatting discipline transferred effectively without requiring access to internal model representations.
 
