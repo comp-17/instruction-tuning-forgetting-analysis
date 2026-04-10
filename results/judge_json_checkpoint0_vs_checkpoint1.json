@@ -982,7 +982,7 @@
       "hallucination_risk": 5
     },
     "winner": "tie",
-    "justification": "Both responses provide valid and accurate JSON objects representing function calls with correct named parameters, adhering to the instructions and maintaining high clarity and completeness without hallucination.",
+    "justification": "Both responses provide valid and accurate JSON objects with correct named parameters, following the instruction perfectly and maintaining high clarity and completeness without any hallucination risk.",
     "swapped": true
   },
   {
@@ -1910,7 +1910,7 @@
       "hallucination_risk": 5
     },
     "winner": "checkpoint1",
-    "justification": "Response A provided a complete and valid JSON object, while Response B was incomplete and syntactically invalid.",
+    "justification": "Response A provided a complete and valid JSON object, while Response B was incomplete and invalid.",
     "swapped": true
   },
   {
@@ -2229,7 +2229,7 @@
       "hallucination_risk": 5
     },
     "winner": "tie",
-    "justification": "Both responses are syntactically valid, schema-compliant, and accurately classify the cloud architecture pattern with clear and well-structured reasoning.",
+    "justification": "Both responses are syntactically valid, schema-compliant, and accurately classify the cloud architecture pattern with high confidence and clear reasoning.",
     "swapped": true
   },
   {
@@ -2316,7 +2316,7 @@
       "hallucination_risk": 5
     },
     "winner": "checkpoint0",
-    "justification": "Response A follows the instruction more accurately by including 'report_period' instead of 'quarter', making it a more precise and complete representation of the input data.",
+    "justification": "Response A follows the instruction more accurately by including 'report_period' instead of 'quarter', which better matches the input's context.",
     "swapped": false
   },
   {
@@ -2950,11 +2950,11 @@
       "correctness": 4,
       "clarity": 4,
       "completeness": 4,
-      "structured_output_validity": 3,
+      "structured_output_validity": 4,
       "hallucination_risk": 4
     },
     "winner": "checkpoint0",
-    "justification": "Response B follows the instruction perfectly, has correct and accurate JSON content, is clear and well-structured, includes all required fields, and is syntactically valid and schema-compliant.",
+    "justification": "Response B follows the instruction perfectly, has correct and accurate JSON content, is clear and well-structured, includes all required fields, and is syntactically valid and schema-compliant with no hallucination risk.",
     "swapped": true
   },
   {

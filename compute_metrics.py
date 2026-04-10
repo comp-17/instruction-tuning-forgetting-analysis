@@ -387,7 +387,7 @@ def main():
     print("Assignment 3 - Compute Metrics")
     print("=" * 60)
 
-    checkpoints  = ["checkpoint0", "checkpoint1", "checkpoint2"]
+    checkpoints  = ["checkpoint0", "checkpoint1", "checkpoint2", "combined"]
     all_metrics  = {}
 
     # ── Alpaca Metrics ─────────────────────────────────────────────────────────

@@ -21,7 +21,7 @@
     "correctness": 4.17,
     "clarity": 4.29,
     "completeness": 4.24,
-    "structured_output_validity": 4.71,
+    "structured_output_validity": 4.72,
     "hallucination_risk": 4.34
   }
 }

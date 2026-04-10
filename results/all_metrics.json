@@ -32,6 +32,17 @@
     "completed": 100,
     "total": 100
   },
+  "combined_alpaca": {
+    "rouge1": 0.1749,
+    "rouge2": 0.0724,
+    "rougeL": 0.1083,
+    "count": 100,
+    "bertscore_f1": 0.837,
+    "avg_length": 684.2,
+    "task_completion_rate": 1.0,
+    "completed": 100,
+    "total": 100
+  },
   "checkpoint0_json": {
     "json_validity_rate": 0.976,
     "valid": 122,
@@ -80,6 +91,25 @@
     "error_taxonomy": {
       "missing_value": 1,
       "unterminated_string": 1
+    },
+    "schema_compliance_rate": 0.0,
+    "compliant": 0,
+    "valid_json": 0,
+    "non_compliant": 125,
+    "exact_match": 0.0,
+    "matches": 0,
+    "field_f1": 0,
+    "field_precision": 0,
+    "field_recall": 0,
+    "count": 0
+  },
+  "combined_json": {
+    "json_validity_rate": 0.976,
+    "valid": 122,
+    "invalid": 3,
+    "total": 125,
+    "error_taxonomy": {
+      "missing_value": 3
     },
     "schema_compliance_rate": 0.0,
     "compliant": 0,

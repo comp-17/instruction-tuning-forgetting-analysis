@@ -1852,7 +1852,7 @@
       "hallucination_risk": 5
     },
     "winner": "checkpoint0",
-    "justification": "Response B is more comprehensive, accurate, and formal, with proper references and technical terminology, making it a better revised paragraph.",
+    "justification": "Response B is more concise, formal, and scientifically accurate, and it fully addresses the instruction by incorporating technical terminology, peer-reviewed references, and precise data.",
     "swapped": true
   },
   {
@@ -2316,7 +2316,7 @@
       "hallucination_risk": 5
     },
     "winner": "checkpoint0",
-    "justification": "Response A provides a more comprehensive and detailed answer, covering multiple examples of phenomena that cannot exist in a vacuum, whereas Response B focuses primarily on sound and provides some incorrect information about other forms of electromagnetic radiation.",
+    "justification": "Response A provides a more comprehensive and detailed answer, covering multiple examples of phenomena that cannot exist in a vacuum, whereas Response B only discusses sound and briefly mentions other forms of energy.",
     "swapped": false
   },
   {

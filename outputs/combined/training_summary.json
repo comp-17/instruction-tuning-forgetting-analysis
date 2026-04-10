@@ -1,0 +1,12 @@
+{
+  "stage": "combined",
+  "model": "microsoft/Phi-3.5-mini-instruct",
+  "dataset": "alpaca_cleaned + teacher_json",
+  "train_examples": 46696,
+  "eval_examples": 100,
+  "epochs": 2,
+  "learning_rate": 2e-05,
+  "lora_rank": 16,
+  "lora_alpha": 32,
+  "final_checkpoint": "/work/fpb170/assignment3/outputs/combined/final"
+}

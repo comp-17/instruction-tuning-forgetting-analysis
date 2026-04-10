@@ -22,7 +22,7 @@
       "correctness": 4.17,
       "clarity": 4.29,
       "completeness": 4.24,
-      "structured_output_validity": 4.71,
+      "structured_output_validity": 4.72,
       "hallucination_risk": 4.34
     }
   },
@@ -30,27 +30,27 @@
     "checkpoint_a": "checkpoint1",
     "checkpoint_b": "checkpoint2",
     "total_comparisons": 125,
-    "wins_a": 28,
-    "wins_b": 46,
+    "wins_a": 27,
+    "wins_b": 47,
     "ties": 51,
-    "win_rate_a": 0.224,
-    "win_rate_b": 0.368,
+    "win_rate_a": 0.216,
+    "win_rate_b": 0.376,
     "tie_rate": 0.408,
     "avg_scores_a": {
       "instruction_following": 4.14,
-      "correctness": 4.21,
-      "clarity": 4.3,
-      "completeness": 4.27,
-      "structured_output_validity": 4.55,
-      "hallucination_risk": 4.35
+      "correctness": 4.2,
+      "clarity": 4.29,
+      "completeness": 4.26,
+      "structured_output_validity": 4.54,
+      "hallucination_risk": 4.34
     },
     "avg_scores_b": {
       "instruction_following": 4.74,
-      "correctness": 4.78,
+      "correctness": 4.79,
       "clarity": 4.81,
       "completeness": 4.72,
       "structured_output_validity": 4.98,
-      "hallucination_risk": 4.89
+      "hallucination_risk": 4.9
     }
   },
   {
@@ -78,6 +78,60 @@
       "completeness": 4.42,
       "structured_output_validity": 4.94,
       "hallucination_risk": 4.55
+    }
+  },
+  {
+    "checkpoint_a": "checkpoint2",
+    "checkpoint_b": "combined",
+    "total_comparisons": 125,
+    "wins_a": 44,
+    "wins_b": 23,
+    "ties": 58,
+    "win_rate_a": 0.352,
+    "win_rate_b": 0.184,
+    "tie_rate": 0.464,
+    "avg_scores_a": {
+      "instruction_following": 4.73,
+      "correctness": 4.73,
+      "clarity": 4.83,
+      "completeness": 4.73,
+      "structured_output_validity": 4.9,
+      "hallucination_risk": 4.8
+    },
+    "avg_scores_b": {
+      "instruction_following": 4.47,
+      "correctness": 4.49,
+      "clarity": 4.69,
+      "completeness": 4.72,
+      "structured_output_validity": 4.84,
+      "hallucination_risk": 4.71
+    }
+  },
+  {
+    "checkpoint_a": "checkpoint1",
+    "checkpoint_b": "combined",
+    "total_comparisons": 125,
+    "wins_a": 20,
+    "wins_b": 32,
+    "ties": 73,
+    "win_rate_a": 0.16,
+    "win_rate_b": 0.256,
+    "tie_rate": 0.584,
+    "avg_scores_a": {
+      "instruction_following": 4.36,
+      "correctness": 4.42,
+      "clarity": 4.47,
+      "completeness": 4.45,
+      "structured_output_validity": 4.7,
+      "hallucination_risk": 4.59
+    },
+    "avg_scores_b": {
+      "instruction_following": 4.8,
+      "correctness": 4.81,
+      "clarity": 4.9,
+      "completeness": 4.86,
+      "structured_output_validity": 4.98,
+      "hallucination_risk": 4.93
     }
   }
 ]

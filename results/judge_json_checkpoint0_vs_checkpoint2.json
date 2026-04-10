@@ -1562,7 +1562,7 @@
       "hallucination_risk": 5
     },
     "winner": "checkpoint2",
-    "justification": "Response A provides a well-structured JSON object with accurate and detailed information, following the instruction perfectly. Response B, while syntactically valid, lacks clarity and detail in its coverage section and does not fully follow the instruction.",
+    "justification": "Response A provides a well-structured JSON object with accurate and detailed information, following the instruction perfectly. Response B, while syntactically valid, lacks clarity and detail in its coverage section and does not follow the instruction as closely.",
     "swapped": true
   },
   {
@@ -1968,7 +1968,7 @@
       "hallucination_risk": 5
     },
     "winner": "checkpoint0",
-    "justification": "Response A is more complete and clearer in its structure, including the description which is part of the original instruction, making it a better representation of the function call.",
+    "justification": "Response A is more comprehensive and clearer in its structure, including both function_name and description, making it easier to understand the context of the function call.",
     "swapped": false
   },
   {
@@ -2838,7 +2838,7 @@
       "hallucination_risk": 5
     },
     "winner": "checkpoint2",
-    "justification": "Response A follows the instruction perfectly, has correct and accurate content, and includes all required fields, whereas Response B lacks completeness and has minor issues with instruction following and correctness.",
+    "justification": "Response A follows the instruction perfectly, has correct and accurate content, is clear and well-structured, and includes all required fields. Response B lacks completeness and has minor issues with instruction following and correctness.",
     "swapped": true
   },
   {
@@ -3389,7 +3389,7 @@
       "hallucination_risk": 4
     },
     "winner": "checkpoint0",
-    "justification": "Response A perfectly follows the instruction, has correct and accurate JSON content, and maintains high clarity and completeness without any hallucination risk.",
+    "justification": "Response A perfectly follows the instruction, has correct and accurate JSON content, and is clear, complete, and syntactically valid with no hallucination risk.",
     "swapped": false
   },
   {
