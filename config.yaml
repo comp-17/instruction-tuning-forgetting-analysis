@@ -69,6 +69,9 @@ evaluation:
     - name: "checkpoint2"
       description: "After Stage 2 Teacher JSON fine-tuning"
       adapter: "outputs/stage2/final"
+    - name: "combined"
+      description: "Single-stage combined Alpaca + Teacher JSON training"
+      adapter: "outputs/combined/final"
 
 # ── Judge Configuration ────────────────────────────────────────
 judge:

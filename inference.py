@@ -261,7 +261,7 @@ def main():
         "--checkpoint",
         type=str,
         required=True,
-        choices=["checkpoint0", "checkpoint1", "checkpoint2", "all"],
+        choices=["checkpoint0", "checkpoint1", "checkpoint2", "combined", "all"],
         help="Which checkpoint to run inference on"
     )
     args = parser.parse_args()
@@ -280,7 +280,7 @@ def main():
     print(f"[GPU] Memory: {torch.cuda.get_device_properties(0).total_memory/1e9:.1f} GB")
 
     if args.checkpoint == "all":
-        for ckpt in ["checkpoint0", "checkpoint1", "checkpoint2"]:
+        for ckpt in ["checkpoint0", "checkpoint1", "checkpoint2", "combined"]:
             run_checkpoint(ckpt)
     else:
         run_checkpoint(args.checkpoint)
